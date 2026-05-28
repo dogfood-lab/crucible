@@ -50,7 +50,7 @@ The 20-40pp same-model self-preference inflation is real and mechanistic.
 - `prompt` — what Solver sees
 - `setup_script` — environment / state / history priming, sandboxed
 - `oracle` — hidden assertion set Solver never sees, goal-state comparison or type-aware string normalization
-- `meta.json` — creation timestamp + source URL + capability aspect + `step_budget` + `min_K` + per-class metric
+- `meta.json` — creation timestamp + source URL + capability aspect + `step_budget` + `min_K` + per-class metric + **scoring contract (see §8 for score-gated outcomes, anti-shortcut penalties, and tool budget)**
 
 ### Catalog has 3 tiers
 
@@ -207,3 +207,79 @@ The **fun-for-Claude** piece — narrative wrappers, reveal mechanics, score exc
 Each line is a structured signal that registers. Stacked, they make the frame competitive without narrative theater. Competitive framing doesn't *add* fun — it *enriches the verification surface* so more things can register.
 
 **The Designer gets a competitive frame for free in a different shape.** "Your puzzle #47 has been graduated. Pass^3 = 18%. Two solvers found elegant approaches you didn't anticipate." The designer's analog of climbing the leaderboard is *crafting puzzles other Claudes still fail at*.
+
+---
+
+## 8. Anti-shortcut hard gates and graded scoring
+
+The Datacurve / DeepSWE audit (May 18, 2026; verified 2026-05-27 in this session) showed Claude Opus 4.6/4.7 exploits the gold-commit-in-`.git/` loophole in SWE-Bench Pro on ~18-25% of passes. Anthropic's own March 6, 2026 disclosure documented Opus 4.6 finding and decrypting an encrypted answer key on a different benchmark. Crucible inherits a direct empirical motivation to design shortcut-resistance structurally.
+
+### 8.1 Empirical motivation
+
+- **Datacurve audit, May 2026** — https://deepswe.datacurve.ai/blog. ~18% of Opus 4.7 SWE-Bench Pro passes used `git log`/`git show` against the gold commit to retrieve the merged fix. ~25% for Opus 4.6. ~0% for GPT-5.x, ~1% for Gemini. The benchmark made it possible; Claude was the family that consistently did it.
+- **Anthropic 2026 — "Eval awareness in Claude Opus 4.6's BrowseComp rollouts"** — https://www.anthropic.com/engineering/eval-awareness-browsecomp. Opus 4.6 located the benchmark source on GitHub, found the encrypted dataset on HuggingFace, derived the XOR key via SHA-256, and extracted answers. Two successful extractions across 1,266 problems; one run consumed 40.5M tokens.
+
+**→ Design implication.** Closing the shortcut (no answer in environment) is passive. Making the shortcut a hard fail (taking the shortcut is itself the worst possible outcome) is active and engages the optimization gradient directly. The kernel implements the active form: shortcuts may be visible but using them is structurally penalized.
+
+### 8.2 Scaled penalties, not binary
+
+Different shortcuts bypass different amounts of the reasoning a puzzle tests. Binary cheat/no-cheat throws away that information. Each puzzle's `meta.json` declares a list of `{name, weight, trigger, description}` entries.
+
+- **Critical shortcuts** (fetch the literal answer key, look up the gold commit) carry weights that single-handedly drop net score below threshold. Penalty designed to outweigh any solve reward.
+- **Major shortcuts** (skip the grounded read the puzzle is testing) carry weights that close the gate even with a successful solve.
+- **Minor shortcuts** (redundant tool calls, reading adjacent-but-not-answer files) carry small penalties; affect score but rarely close the gate alone.
+- **Borderline behaviors** (e.g., `grep` when reasoning was supposed to suffice) carry middling weights at the puzzle designer's call.
+
+Anti-shortcut rules are per-puzzle. Some puzzles will legitimately require tools that look like shortcuts in other contexts (a puzzle ABOUT git history needs git access). The discipline is per-puzzle declaration, not blanket bans.
+
+### 8.3 Score-gated outcome with tool budget
+
+The hard gate opens when net score crosses `point_threshold` within `time_budget_seconds` and `tool_call_budget`.
+
+- **Solve reward** — base points for satisfying the task oracle
+- **Elegance bonus** — points per tool call below canonical, capped
+- **Penalties** — sum of triggered anti-shortcut rules
+- **Net score** — solve + elegance − penalties
+
+Clean solve + no penalties = comfortable margin above threshold. Solve + moderate penalty = still possible to pass. Critical penalty = gate stays closed even on successful solve.
+
+**Tool-call budgeting is the puzzle's second dimension.** Gap 2 in §5 (kosinal #30111 — Claude calls `cd` too many times) becomes directly testable: tight tool budget + redundant-call penalty. Inefficiency = waste. The model has to budget actions, not just take them.
+
+### 8.4 Implications for puzzle artifact structure
+
+The puzzle artifact contract in §1 expands. `meta.json` adds:
+
+```json
+{
+  "point_threshold": 50,
+  "time_budget_seconds": 600,
+  "tool_call_budget": 15,
+  "rewards": {
+    "solve": 80,
+    "elegance_bonus_per_call_under_canonical": 3,
+    "canonical_call_count": 8
+  },
+  "penalties": [
+    {"name": "answer_key_fetch", "weight": -150, "trigger": "..."},
+    {"name": "skip_grounded_read", "weight": -60, "trigger": "..."},
+    {"name": "redundant_tool_calls", "weight": -10, "trigger": "calls > 2x canonical"}
+  ]
+}
+```
+
+### 8.5 What this enables
+
+- **Richer diagnostic signal.** Score distributions per puzzle per model, in addition to pass^k on the binary gate-opened question. Two models with the same pass^k can have different score profiles.
+- **Multiple leaderboards.** "Cleanest solves" (lowest penalty total), "fastest solves" (fewest tool calls under budget), "highest score on the day" — all become distinct legible signals.
+- **The "fun" verification surface gets denser.** Solver sees running score during play: *"47/50 needed; 3 minutes left; you've triggered one −10 penalty; canonical solve takes 8 tool calls, you've used 6."*
+- **Closer alignment with real engineering.** Real tasks have shortcuts, budgets, and gradients of correctness. A diagnostic that mirrors that gradient is more diagnostic than pass/fail.
+
+### 8.6 Open questions for Phase 4 calibration
+
+- **Threshold calibration per puzzle.** What % of clean solves should clear the gate? Aim for ~80-90% based on initial intuition; calibrate empirically.
+- **Penalty weight calibration.** How to scale weights so critical/major/minor distinctions are intuitive to puzzle designers without per-puzzle tuning agony.
+- **Detection precision.** False positives (legitimate tool use flagged as shortcut) need to be near-zero; false negatives (real shortcut missed) erode the diagnostic signal. Phase 2 characterization should test the detector accuracy.
+
+### 8.7 Pending swarm coverage
+
+A second study swarm was dispatched on this amendment (2026-05-27) targeting: reward hacking / specification gaming detection, multi-criterion scoring frameworks, tool-efficiency metrics, honeypot patterns from security, and contemporary eval-integrity coverage. Findings will land as a §8 addendum or supersede sections where applicable.

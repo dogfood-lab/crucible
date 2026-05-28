@@ -68,7 +68,9 @@ Candidate panel (subject to characterization):
 
 ## Current state
 
-Phase 0 complete (this commit). Phase 1 work can begin immediately (no hardware dependency). Phase 2 begins when Omen lands and ollama-intern is wired to it.
+Phase 0 complete (initial commit). **Amended 2026-05-27** with anti-shortcut hard gates + scaled scoring + tool-budget contract, motivated by the Datacurve / DeepSWE audit (May 18, 2026) verifying Claude-specific shortcut exploitation on SWE-Bench Pro. See [`research-grounding.md` §8](research-grounding.md). Second study swarm dispatched in parallel to pull fresh literature on reward hacking, multi-criterion scoring, tool-efficiency metrics, honeypot patterns, and contemporary eval-integrity work; findings land as a §8 addendum.
+
+Phase 1 work can begin immediately (no hardware dependency). Phase 2 begins when Omen lands and ollama-intern is wired to it.
 
 ## Open architectural questions
 
