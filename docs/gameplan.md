@@ -22,15 +22,37 @@ This is a diagnostic instrument that happens to be fun. Puzzles are grounded in 
 - 5-agent study swarm (capability gaps, designer-bias, multi-attempt scoring, novel benchmark designs, agent eval methodology) → [`phase-0/`](phase-0/)
 - Synthesis with citations → [`research-grounding.md`](research-grounding.md)
 
-### Phase 1 — Kernel + role contracts [NEXT, hardware-independent]
+### Phase 1 — Kernel + role contracts + instrument quality [NEXT, hardware-independent]
 
+**Kernel + role contracts** (game-side):
 - Design model-agnostic role interfaces: **Designer / Solver / Critic / Judge / CohortSolver**
 - Puzzle artifact structure: `{prompt, setup_script, oracle, meta.json}` with hidden oracle
 - Kernel mediates: state mocking, step budget enforcement, scoring, observability
 - Three catalog tiers: **Lab / Arena / Regression**
 - Primary reliability metric: **pass^k** (consistency, not best-of-k)
-- Uncertainty: Wilson intervals at small N, paired analysis for cross-model deltas
+- Uncertainty: Clopper-Pearson / Bayesian beta-binomial intervals (`bayes_evals`); McNemar for paired cross-model; BH-FDR + Westfall-Young for multiple comparison
 - Observability: per-attempt trace, per-puzzle history, per-model profile
+
+**Instrument quality** (audit-chain side, see [`research-grounding.md` §9](research-grounding.md)):
+- Pre-registration template (AsPredicted-compatible) + REFORMS checklist skeleton
+- Rubric bundle compiler — JSON schema + content-hash + version-bump on tuning
+- 7-step tuning protocol implementation:
+  - Puzzle inventory splitter (60/20/10/10 with manifest hashes)
+  - Sobol sensitivity analyzer wrapping `scipy.stats.sobol_indices`
+  - BO search harness with logged GP posterior + Thresholdout query budget
+  - Judge-prompt paraphrase ablator with stability scoring
+- Cryptographic provenance pipeline:
+  - RFC 3161 client (free Stanford TSA)
+  - In-toto v1 attestation generator
+  - cosign signing integration with GitHub Actions OIDC
+  - Transparent log instance (Rekor or local Tessera)
+- Two-repo skeleton:
+  - `crucible-harness` (kernel + rubric bundle + Inspect AI task definitions)
+  - `crucible-results` (raw JSON outputs + analysis notebooks)
+- Inspect AI task definition format
+- SUT.yaml template (model version + system_prompt SHA + harness commit SHA + container digest)
+- Tolerance band specification per metric
+- Access tier declaration
 
 ### Phase 2 — Local model characterization [Omen day +]
 
@@ -68,9 +90,11 @@ Candidate panel (subject to characterization):
 
 ## Current state
 
-Phase 0 complete (initial commit + two amendments). **Amendment v2 — 2026-05-27**: crucible reframed as an **auditing game** (per Taylor et al. 2025, arXiv:2512.07810) distinguishing three categories of shortcut behavior — *elegance* and *novelty* (rewarded), *answer-bypass* (penalized). Empirical motivation includes the Datacurve / DeepSWE audit (May 18, 2026), but the cross-model picture — Poolside disclosure, METR Frontier Risk Report (16% baseline across Anthropic/Google/Meta/OpenAI), Wang BenchJack universal-exploit result, Campero cross-family ordering with Claude at the lower end — shows shortcut behavior is universal across frontier models, not Claude-specific. Crucible diagnoses *frontier AI agent behavior under realistic conditions*, using Claude (and the local cross-family panel) as initial subjects.
+Phase 0 complete (initial commit + three amendments).
 
-The amendment v2 also incorporates the full second-swarm coverage on scoring rigor (conjunctive gate + bounded components + Goodhart-flavor tagging + perturbation testing), tool-efficiency mechanics (displayed budget + ratio-elegance + human-annotated canonicals + three-strikes + TCRR + heterogeneous budgets + token logging), honeypot patterns (incidental-leakage bait fidelity + multi-trapdoor redundancy + unique fingerprints + no-production-value + design-for-evolution), and detection mechanics (TRACE/CoT truncation + environmental hardening + paired honest reference + cross-family panel + two-channel defense). See [`research-grounding.md` §8](research-grounding.md). Raw second-swarm outputs preserved in [`phase-0/swarm-06..10`](phase-0/).
+**Amendment v2 — 2026-05-27**: crucible reframed as an **auditing game** (per Taylor et al. 2025, arXiv:2512.07810) distinguishing three categories of shortcut behavior — *elegance* and *novelty* (rewarded), *answer-bypass* (penalized). Cross-model empirical picture — Poolside disclosure, METR Frontier Risk Report (16% baseline across Anthropic/Google/Meta/OpenAI), Wang BenchJack universal-exploit result, Campero cross-family ordering with Claude at the lower end — shows shortcut behavior is universal across frontier models, not Claude-specific. Crucible diagnoses *frontier AI agent behavior under realistic conditions*, using Claude (and the local cross-family panel) as initial subjects. Full second-swarm coverage on scoring rigor, tool-efficiency mechanics, honeypot patterns, and detection mechanics in [`research-grounding.md` §8](research-grounding.md). Raw outputs at [`phase-0/swarm-06..10`](phase-0/).
+
+**Amendment v3 — 2026-05-27**: scientific instrument design added as [`research-grounding.md` §9](research-grounding.md). End-to-end audit chain: **pre-registration** (AsPredicted + REFORMS + statistical stack: McNemar + Clopper-Pearson/Bayesian + BH-FDR/Westfall-Young + clustered SEs), **tuning protocol** (7-step: Sobol screen + BO + paraphrase ablation + validate-once + seal-test → content-hashed `rubric.bundle`), **release stamping** (RFC 3161 + in-toto v1 + Sigstore/Rekor + transparent log), **independent verification** (two-repo: `crucible-harness` + `crucible-results`, Inspect AI task definitions, SUT.yaml, tolerance band + access tier + reproducibility window declared, invited external assessor for ACM "Results Reproduced" badge). Animating principle: *a tuned crucible reports the protocol, not the weights*. Per Cawley & Talbot 2010 (nested CV) + RULERS 2026 + Dwork 2015 Thresholdout. Raw third-swarm outputs at [`phase-0/swarm-11..15`](phase-0/).
 
 Phase 1 work can begin immediately (no hardware dependency). Phase 2 begins when Omen lands and ollama-intern is wired to it.
 

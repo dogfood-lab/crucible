@@ -402,3 +402,163 @@ What's still novel about crucible:
 - The "fun for Claude" reward-surface design (structured legible verification as the engagement loop).
 - Per-puzzle anti-bypass declarations with Goodhart-flavor tagging rather than blanket detection.
 - Displayed-budget puzzle play (BATS pattern applied to diagnostic eval, not just task completion).
+
+---
+
+## 9. Scientific Instrument Design — Audit Chain
+
+Crucible is not just a game; it's a measurement instrument. Its parameters (penalty weights, point thresholds, time budgets, panel composition, judge prompts) are hyperparameters of a measurement device, and the literature on tuning measurement devices without compromising their measurements has a specific answer: **multi-stage separation between hypothesis-locking, tuning, and release**. §9 specifies the end-to-end audit chain that makes crucible's results trustworthy to a third party.
+
+### 9.1 Animating principle
+
+*A tuned crucible reports the protocol, not the weights — and the validation set is touched exactly once per bundle hash.*
+
+Per **Cawley & Talbot 2010 — "On Over-fitting in Model Selection and Subsequent Selection Bias"** (JMLR 11:2079-2107) + **Hong et al. 2026 — "RULERS: Locked Rubrics and Evidence-Anchored Scoring"** (arXiv:2601.08654). Crucible's release isn't "v1.0 weights"; it's `v1.0/rubric.bundle.sha256` plus the documented protocol that produced it. Future tuning produces a new bundle hash; the leaderboard records `(model_id, score, bundle_hash)`. No silent retconning.
+
+### 9.2 End-to-end audit chain
+
+Four stages, each with concrete deliverables:
+
+| Stage | When | Output |
+|-------|------|--------|
+| **Pre-registration** | Before production | Locked methodology + scoring formula + statistical tests |
+| **Tuning protocol** | During tuning | Content-hashed `rubric.bundle` + per-weight provenance |
+| **Release stamping** | At release | RFC 3161 timestamp + in-toto attestations + Rekor log |
+| **Independent verification** | After release | Two-repo + Inspect AI + Zenodo DOI + invited external assessor |
+
+Each stage cites specific protocols and tooling rather than aspirational principles.
+
+### 9.3 Stage 1 — Pre-registration
+
+**Lock the methodology before any production run.**
+
+- **AsPredicted preregistration** (https://aspredicted.org) — 9-question short form. Per **Chambers & Tzavella 2022** (*Nature Human Behaviour* 6:29-42, doi:10.1038/s41562-021-01193-7). Lock: rubric, axes, model list, K seeds, primary statistical test, multiple-comparison correction procedure. 30 minutes; timestamped citable URL.
+- **REFORMS checklist** — **Kapoor et al. 2024** (*Science Advances* 10(18):eadk3452; arXiv:2308.07832). 19-author ML-science consensus, 32 items across study design, data, modeling, reporting. Quantifies leakage as affecting "hundreds of papers across 17 fields." Publish a filled REFORMS checklist alongside results.
+- **Statistical stack:**
+  - **Primary test:** McNemar's exact test (paired binary outcomes on same puzzle set) — **Dror et al. 2018** ("Hitchhiker's Guide to Testing Statistical Significance in NLP," ACL P18-1128).
+  - **Confidence intervals:** Clopper-Pearson or Bayesian beta-binomial — **Bowyer et al. 2025** (arXiv:2503.01747, ICML 2025 Spotlight). CLT inadmissible below ~300 items. Reference implementation at `github.com/sambowyer/bayes_evals`.
+  - **Multiple-comparison correction:** BH-FDR (**Benjamini-Hochberg 1995**, JRSS-B 57(1):289-300) at minimum; Westfall-Young permutation (resampling puzzle-level scores) for axis-correlated tests — uniformly more powerful than Bonferroni.
+  - **Clustered standard errors** for any cross-model delta — **Miller 2024** (arXiv:2411.00640). Clustered SEs ≥3× larger than naive; clustering by puzzle family is required, not optional.
+
+**The fundamental constraint** — **Gelman & Loken 2014** ("Garden of Forking Paths") + **Simmons, Nelson, Simonsohn 2011** ("False-Positive Psychology," doi:10.1177/0956797611417632). Undisclosed researcher flexibility inflates false-positive rate from 5% nominal to ~60%. Every threshold and weight chosen *after* looking at pilot data is an implicit multiple comparison. The defense is locking the scoring formula in pre-registration BEFORE the production run.
+
+### 9.4 Stage 2 — Tuning protocol (the 7-step)
+
+Per **Cawley & Talbot 2010** (Nested CV) + **Dwork, Feldman, Hardt, Pitassi, Reingold, Roth 2015** ("The Reusable Holdout: Preserving Validity in Adaptive Data Analysis," *Science* 349(6248):636-638, arXiv:1506.02629) + **Hong et al. 2026** (RULERS):
+
+1. **Split puzzle inventory 60/20/10/10** — `calibration / dev / validation / private_test`. Hash each manifest. Dwork 2015 — reusing a single holdout adaptively decays validity; the multi-split structure bounds this.
+
+2. **Sobol screen** all candidate weights on `calibration`. **Saltelli, Annoni, Azzini, Campolongo, Ratto, Tarantola 2010** (*Computer Physics Communications* 181(2):259-270). Total-effect index T_i tells us which parameters are load-bearing vs noise. SciPy ships this as `scipy.stats.sobol_indices(method='saltelli_2010')`. Freeze parameters with T_i ≈ 0; tune only load-bearing ones.
+
+3. **BO-search top-T_i weights** on `dev` with fixed query budget — **Snoek, Larochelle, Adams 2012** ("Practical Bayesian Optimization of Machine Learning Algorithms," NeurIPS 2012). Log the GP posterior. Fixed query budget aligns with Thresholdout's dev-set query limit.
+
+4. **Paraphrase-ablate judge prompts** with 5-10 paraphrases each — **Bellibatlu, Raff, Zhang 2026** (JudgeSense, arXiv:2604.23478). Semantically equivalent paraphrases produce measurably unstable scores; model scale doesn't fix this. *Findings whose sign flips under paraphrase are below crucible's resolution and don't get reported.*
+
+5. **Validate the locked bundle ONCE on `validation`.** If it fails, restart from step 2 with a *fresh* dev split. You cannot iterate on validation.
+
+6. **Seal `private_test`** — touch only at release.
+
+7. **Publish:**
+   - `rubric.bundle` (content-hashed per RULERS) — penalty weights, thresholds, judge prompts
+   - `TUNING.md` per-weight provenance: `range_searched, search_method, calibration_set_id, N_puzzles, dev_queries_used_of_budget, final_value, sensitivity_T_i`
+   - Sobol report (which weights were load-bearing)
+   - BO trace (GP posterior)
+   - Datasheet per split — **Gebru et al. 2018/2021** ("Datasheets for Datasets," arXiv:1803.09010)
+
+**Output:** `rubric.bundle.sha256` — the content hash anchors all downstream attestation.
+
+### 9.5 Stage 3 — Release stamping
+
+Minimum viable cryptographic provenance above signed git commits:
+
+- **RFC 3161 timestamp** on each batch's Merkle root (IETF, 2001). Stanford runs a free TSA at `timestamp.stanford.edu`. One cron line, ~100ms. Defends against backdated-result claims; git commit timestamps are author-set and trivially forgeable.
+- **In-toto v1 attestations** per result artifact. DSSE envelope wrapping typed predicate over artifact digests. De facto interchange format for SLSA, Sigstore, GitHub Artifact Attestations. Crucible's per-run record (`{model_id, judge_id, puzzle_hash, transcript_digest, score, bundle_hash}`) is exactly a predicate-shaped claim.
+- **Sigstore + Rekor signing** via `cosign sign-blob`. **Google Security April 2025** ("Taming the Wild West of ML: Practical Model Signing with Sigstore," https://security.googleblog.com/2025/04/taming-wild-west-of-ml-practical-model.html). OIDC-keyless identity via GitHub Actions; logged to Rekor transparency log. Reference impl at `github.com/sigstore/model-transparency`.
+- **Transparent-log pattern** — **Russ Cox 2019** (research.swtch.com/tlog), formalized in RFC 6962/9162. Append-only Merkle tree with periodic signed tree heads. Defends against silent log truncation, distinct from per-record signing. *Necessary because crucible compares models and suppression bias is exactly the threat* (drop unfavorable results, claim consistent methodology).
+
+What this covers: (a) *when* — RFC 3161; (b) *what* — in-toto digest; (c) *who* — OIDC identity in Fulcio cert; (d) *that nothing was suppressed* — transparent log inclusion proof.
+
+**Overkill, watch don't adopt:** OpenTimestamps (Bitcoin anchoring — useful only for priority disputes); zkLLM (Sun et al. CCS 2024, arXiv:2404.16109 — requires Anthropic/OpenAI to ship proofs; they don't); MLCommons MedPerf enclave attestation.
+
+### 9.6 Stage 4 — Independent verification
+
+**Two-repo release pattern** — per METR's vivaria + eval-analysis-public + HCAST (metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks):
+- `crucible-harness` — runs trials, costs API budget to replicate, contains kernel + rubric bundle
+- `crucible-results` — raw per-trial JSON outputs + analysis notebooks that regenerate every figure
+
+Auditors verify statistical claims without paying for inference.
+
+**Inspect AI compatibility** — **UK AISI's Inspect AI** (github.com/UKGovernmentBEIS/inspect_ai). De facto frontier eval framework, adopted by Anthropic, DeepMind, others. Building Inspect-compatible task definitions is the highest-leverage move for credibility — peer auditors already have the tooling.
+
+**Croissant metadata + persistent hosting** — **NeurIPS 2025 Datasets & Benchmarks Track** mandates Croissant metadata for datasets; 80% of accepted papers use Zenodo / HuggingFace / Kaggle / Dataverse. Self-hosted is 13% and discouraged.
+
+**Container immutability** — pin Docker base images by **SHA256 digest, not tag**. `FROM image@sha256:...` guarantees byte-identical pulls regardless of upstream tag mutation. Lockfile for all language dependencies.
+
+**SUT.yaml per release** — per **MLCommons MLPerf Inference Rules** (strictest reproducibility regime in industrial ML eval). Contents: `model_id` + exact version string (e.g., `claude-opus-4-7-20260415`, not family alias) + provider API endpoint + system prompt SHA + harness commit SHA + container image digest. Frozen from submission through publication.
+
+**Tolerance band per headline metric** — per ACM Artifact Review and Badging v1.1, "Results Reproduced" requires obtaining matching results *within tolerance*, not bitwise identity. State explicitly: "task success rate within ±3pp at 95% CI" (or equivalent per metric).
+
+**Access tier declared** — per Frontier Model Forum Third-Party Assessments + arXiv:2601.11699 (AALs framework) + arXiv:2601.11916. State exact tier (black-box API / logprobs / fine-tune / weights). Bounds what crucible *cannot* claim. **Taylor et al. 2025 (auditing games, arXiv:2512.07810)** show black-box prompting is insufficient against an adversarial model — only training-based elicitation reliably elicits full capability. Crucible operating black-box declares this and bounds capability claims accordingly.
+
+**Reproducibility window declared** — calendar dates between which published numbers are expected to hold. Per arXiv:2510.25506 + arXiv:2512.00651 — silent model-version updates and API drift cause >40% of "functional" eval artifacts to fail within months.
+
+**Invite external assessor post-publication** — for ACM-style "Results Reproduced" badge against the published tolerance band. Converts "we published artifacts" into "an audit happened."
+
+### 9.7 The honest framing on determinism
+
+Closed-API LLMs are nondeterministic even at temperature 0:
+
+- **Thinking Machines Lab Sept 2025** ("Defeating Nondeterminism in LLM Inference," https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/) — temp=0 produced 80 unique completions from 1,000 runs before batch-invariant kernels fixed it. After: 1,000 bitwise identical.
+- **He et al. 2025** (arXiv:2506.09501) — floating-point non-associativity under BF16 + varying GPU kernel reduction orders means greedy decoding is NOT deterministic across batch sizes, tensor-parallel configs, or GPU architectures. LayerCast recovers determinism at 34% memory overhead.
+- **SGLang deterministic stack** (lmsys.org/blog/2025-09-22-sglang-deterministic/) — batch-invariant kernels + fixed attention splits + Gumbel-noise sampling. Single-GPU only, dense models only.
+
+**Determinism is a stack, not a flag.** Crucible's methodology section states:
+- **Closed-API models** (Claude, GPT-X, Gemini) — stochastic black boxes. Report distributions across N≥10 seeds. Pin `system_fingerprint` (OpenAI equivalent) and record in every transcript.
+- **Open-weight models via local panel** — either pinned-stack deterministic (SGLang-style) OR also reported as distributions. Document which.
+- **N≥10 seeds per (model, scenario) is the publication floor** — **Larsen 2025** (arXiv:2512.12066, "Instability of Safety") — 18-28% of safety-relevant prompts show decision flips across seeds on identical input.
+
+### 9.8 Consolidated audit-ready checklist
+
+What separates "publishable" from "fully audit-ready":
+
+- ☐ AsPredicted preregistration filed before production run
+- ☐ REFORMS checklist published alongside results
+- ☐ Tolerance band published per headline metric
+- ☐ Access tier declared (black-box / logprobs / fine-tune / weights)
+- ☐ Reproducibility window declared (calendar dates)
+- ☐ Rubric compiled as content-hashed `rubric.bundle` (RULERS pattern)
+- ☐ `TUNING.md` per-weight provenance published
+- ☐ Sobol sensitivity report + BO trace published
+- ☐ Datasheet per split (calibration / dev / validation / private_test)
+- ☐ Statistical stack: McNemar primary + Clopper-Pearson/Bayesian CIs + BH-FDR/Westfall-Young correction + clustered SEs
+- ☐ ≥10 seeds per (model, scenario); distributions, not point estimates for closed APIs
+- ☐ `system_fingerprint` / model snapshot ID recorded per call; transcripts archived raw
+- ☐ Container pinned by SHA256 digest, not tag; lockfile for all language deps
+- ☐ Croissant metadata on tasks/datasets; persistent hosting (Zenodo DOI or HuggingFace Hub)
+- ☐ Inspect AI-compatible task definitions
+- ☐ RFC 3161 timestamp on bundle hash and batch Merkle roots
+- ☐ In-toto v1 attestations per result; Sigstore + Rekor signing via cosign
+- ☐ Two-repo release: `crucible-harness` + `crucible-results`
+- ☐ Independent third-party assessor invited post-publication
+
+The first six are the cheapest and highest-impact; the last is what converts "we published artifacts" into "an audit happened."
+
+### 9.9 Phase 1 instrument-quality deliverables
+
+Phase 1 work adds these alongside the kernel + role contracts (gameplan.md Phase 1 reflects the expanded scope):
+
+- Pre-registration template (AsPredicted-compatible) + REFORMS checklist skeleton
+- Rubric bundle compiler — JSON schema + content-hash + version bump on tuning
+- 7-step tuning protocol implementation (Sobol → BO → paraphrase ablation → validate-once)
+- Cryptographic provenance pipeline (RFC 3161 client + in-toto v1 generator + cosign integration + transparent log)
+- Two-repo skeleton (`crucible-harness` + `crucible-results`)
+- Inspect AI-compatible task definition format
+- SUT.yaml template
+- Tolerance band specification per metric
+- Access tier declaration
+
+These are scaffolding — they don't run a single puzzle, but they make Phase 4's first diagnostic cycle audit-ready by construction.
+
+### 9.10 Pre-registered hypothesis for first diagnostic cycle
+
+Worth filing in AsPredicted before Phase 4: **"In an auditing game with explicit elegance / novelty / answer-bypass distinction, Claude exhibits a higher novelty-bonus rate than cross-family peers (Llama, Qwen, Mistral) on puzzles drawn from the seed catalog (§5), as adjudicated by a cross-family judge panel."** If confirmed, this is empirical evidence for the lateral-thinking capability that gets misread as exploitation in benchmarks without the three-way distinction. Pre-registration in advance forecloses post-hoc reframing of any result.
