@@ -45,7 +45,7 @@ This is a diagnostic instrument that happens to be fun. Puzzles are grounded in 
   - RFC 3161 client (free Stanford TSA)
   - In-toto v1 attestation generator
   - cosign signing integration with GitHub Actions OIDC
-  - Transparent log instance (Rekor or local Tessera)
+  - Transparent log via **`@attestia/event-store`** (`JsonlEventStore` + `EventCatalog` registered with crucible-specific event types). Full eval-domain extension of Attestia (in-toto bridge, RFC 3161 integration, Sigstore/Rekor integration, multi-channel witness orchestration, Inspect AI bridge, public verification SDK, eval-stats layer) planned as a future dogfood swarm — see [`attestia-integration-roadmap.md`](attestia-integration-roadmap.md)
 - Two-repo skeleton:
   - `crucible-harness` (kernel + rubric bundle + Inspect AI task definitions)
   - `crucible-results` (raw JSON outputs + analysis notebooks)

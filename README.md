@@ -10,5 +10,6 @@ Puzzles are grounded in empirical signal — GitHub issues, social discourse, ac
 ## Where to look
 
 - [`docs/gameplan.md`](docs/gameplan.md) — phases, current state, open questions
-- [`docs/research-grounding.md`](docs/research-grounding.md) — design decisions with citations
-- [`docs/phase-0/`](docs/phase-0/) — raw research outputs (ChatGPT Deep Research + 5-agent study swarm)
+- [`docs/research-grounding.md`](docs/research-grounding.md) — design decisions with citations (§1-7 foundations, §8 auditing-game design, §9 scientific instrument design)
+- [`docs/attestia-integration-roadmap.md`](docs/attestia-integration-roadmap.md) — planned future dogfood swarm to extend `mcp-tool-shop-org/Attestia` into crucible's audit-chain backbone
+- [`docs/phase-0/`](docs/phase-0/) — raw research outputs (ChatGPT Deep Research + three study swarms covering capability gaps, designer-bias, scoring methodology, benchmark designs, agent eval, reward-hacking detection, multi-criterion scoring, tool-efficiency metrics, honeypot patterns, eval-integrity, replication packages, pre-registration, cryptographic provenance, third-party audit, ablation/tuning)
