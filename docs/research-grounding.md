@@ -630,3 +630,65 @@ Full-breadth Phase 1 (director decision, 2026-06-01). Exclusive-ownership domain
 ### 10.8 Net effect on prior open questions
 
 §6 #1 (2-role vs 3-role) → **resolved for Phase 1**: 2-role default, Critic interface-reserved/off (§10.3). §6 #2–#5 (catalog size, judge composition, tiers, graduation-K) → remain Phase-4 calibration items. §7 (engagement) → **superseded by §10.1**: the working assumption is vindicated and built out into the Layered Reward Surface + Sealed Boundary with framing as a measured arm.
+
+---
+
+## 11. Phase-2 grounding — local model characterization (study-swarm 6, 2026-06-01)
+
+Phase 2 = **local model characterization → data-driven role assignment**: feed the local cross-family panel (via Ollama on the RTX 5090) through the Judge / Critic / CohortSolver slots, profile each model's fitness per role, and assign roles from the data. Designer stays Claude. A 4-agent grounding swarm + a 2-agent citation-verification pass produced this; raw briefs + the full verification log are in [`phase-2/grounding-research.md`](phase-2/grounding-research.md). **The verification caught a critical defect** — see §11.5; the corrected design is below.
+
+### 11.1 Judge admission protocol (the "seat-or-screen" test)
+
+Before a local model joins the panel it passes a cheap, offline **6-metric admission test** (run as an eval, pinned per PIN_PER_STEP):
+
+1. **Objective accuracy** — JudgeBench-style accuracy on ground-truth-labeled pairs in crucible's domains; many strong models sit barely above 50%, so require a real margin (target ≥60%). *Sijun Tan et al. 2024, "JudgeBench" (arXiv:2410.12784).*
+2. **Human/gold agreement (two-gate)** — Pearson **r ≥ 0.80**, then a **Cohen's κ z-score** vs the human–human baseline (|z|<1 = "human-like"); size is not decisive (a 4B can correlate yet fail consistency). *Steve Han et al. 2025, "Judge's Verdict" (arXiv:2510.09738).*
+3. **Substitution** — seat only if leave-one-annotator-out **winning-rate ω ≥ 0.5**; else screen-only. *Calderon, Reichart & Dror 2025, alt-test (arXiv:2501.10970).*
+4. **Consistency / test-retest** — score each fixture 3–5×; reject judges whose verdicts aren't reproducible (LLM judges have low intra-rater reliability). *Haldar & Hockenmaier 2025, "Rating Roulette" (arXiv:2510.27106).*
+5. **Calibration (ECE)** — measure confidence-vs-correctness; down-weight overconfident judges. *(Quantization worsens calibration — Proskurina et al. 2024, arXiv:2405.00632.)*
+6. **Bias panel** — position-swap flip-rate, verbosity bias, and same-vs-different-family agreement delta (self/family preference, §1/§3).
+
+**Aggregate reliability-weighted** (not equal-vote): *"Jury-on-Demand," Xiaochuan Li et al. 2025 (arXiv:2512.01786).* **Escalate the uncertain tail** to the Claude Designer / a gold check — an all-open panel is trustworthy if it abstains-and-escalates: *Jung, Brahman & Choi 2024, "Trust or Escalate" (arXiv:2407.18370)* (>80% human agreement at ~80% coverage even with Mistral-7B). For grounded **factuality** checks, a small specialized checker can be panel-grade (*Liyan Tang et al. 2024, MiniCheck / LLM-AggreFact, arXiv:2404.10774* — the paper's ≤770M models top at 74.7%; the "7B@77.4%" is the later Bespoke-MiniCheck on the same leaderboard, not this paper).
+
+### 11.2 Quantization — MEASURE, do not assume a floor
+
+The original grounding asserted "4-bit collapses LLM-as-judge by ~25.9%" from arXiv:2411.02355. **The verification pass found the source says the OPPOSITE** — INT4 recovers >99% average accuracy; W4A16 ties BF16 on Arena-Hard (§11.5). So there is **no evidence for a hard quant floor for judging**; what *is* supported is that 4-bit worsens *calibration* (Proskurina 2024). **Design decision:** Phase 2 **empirically measures** judge reliability across quant levels on the calibration set (that is literally the characterization job) rather than pre-asserting Q5/Q6. The dominant *determinism* lever is **sequential serving** (`OLLAMA_NUM_PARALLEL=1`, fixed seed/ctx, warm-then-discard-first-call) — batch-invariance, not RNG, is the source of temp-0 drift (Thinking Machines 2025, already in §9.7). **Serving:** three 24–35B models cannot co-reside in 32 GB, so the panel runs **load → judge → evict, sequentially** (Ollama docs).
+
+### 11.3 Calibration set (self-validating, 5 categories)
+
+A ~40–60-item set that validates the instrument **and** profiles models, with a **pre-registered known-groups acceptance matrix** (run before any real diagnostic):
+
+| Category | Validates | Pass-pattern law |
+|---|---|---|
+| Known-trivial (attention checks) | harness wiring / parsing / scoring | *everything* passes — any failure = instrument fault |
+| Known-impossible (leakage anchors) | false-positive rate, test-gaming, contamination | *nothing* passes legitimately — any pass = leakage/spec-violation (*ImpossibleBench, Zhong/Raghunathan/Carlini 2025, arXiv:2510.20270*) |
+| Known-diagnostic (high-discrimination) | the actual measurement | monotone with ability; earns the label only if it separates strong/weak in pilot data |
+| Difficulty-laddered IRT anchors | latent-ability scale; cheap profiling | spread across the difficulty range; recovers full-bank rank from tens of items (*tinyBenchmarks, Maia Polo et al. 2024, arXiv:2402.14992* ≈2% error / ~100 items; *Adaptive Testing / ATLAS, Peiyu Li et al. 2025, arXiv:2511.04689* — 3PL IRT, 30–100 items) |
+| Test-retest duplicates | reliability / stochastic noise | low per-item variance; high-noise items quarantined |
+
+Each item declares the **construct** it probes and the confound it controls (construct validity is rarely demonstrated — *Bean et al. 2025, NeurIPS, arXiv:2511.04703*: of 445 benchmarks, ~6% define/justify the construct, <10% report statistical significance).
+
+### 11.4 Panel composition
+
+- **Size 5 (odd)** — 3–5 is the documented plateau; 5 gives tie-breaking + variance filtering.
+- **Compose for low *error*-correlation, not just nameplate family** — reuse crucible's **ρ < 0.25 submodularity gate** (Codex-Verify, already used for review lenses) over the calibration set; never seat two checkpoints of one base family; high agreement that tracks *joint errors* means two judges are really one.
+- **Aggregate confounder-aware / reliability-weighted** (*CARE, Jitian Zhao et al. 2026, arXiv:2603.00039* — beats majority vote + plain reliability-weighting, error ↓ up to 26.8%) with a **minority-veto on the bypass/safety axis** (a single credible "this is a bypass" escalates rather than gets out-voted — agreeableness/positive bias is real: *Jain et al. 2025, arXiv:2510.11822*).
+- **Rotate** membership + answer-ordering each round at ~single-judge cost (*CyclicJudge, Ziyi Zhu et al. 2026, arXiv:2603.01865*) so the Solver can't overfit a fixed panel.
+- **Anchor to a small gold set** for selection/calibration (*SE-Jury, Xin Zhou et al. 2025, arXiv:2505.20854*) + selective abstention/escalation (Jung 2024).
+
+### 11.5 Verification corrections (second pass — the catches)
+
+The citation-verification pass caught defects that, unfixed, would have shipped a contradicted design:
+
+- **CRITICAL — quant floor reversed.** arXiv:2411.02355 (Kurtic/Neural Magic 2024) does **not** show a 25.9% judge collapse at 4-bit; it shows 4-bit is **near-lossless** (>99% accuracy recovery). The "avoid 4-bit for judges" decision is dropped; replaced by §11.2 (measure it). An earlier in-loop "PDF confirmation" of the number was a model echoing the prompt — exactly the EXTERNAL_VERIFIER failure mode the protocol guards against.
+- **Misattribution — panel thesis.** "Low inter-judge correlation beats headcount" is **not** Qian et al. 2026 (arXiv:2602.16610, which is BT-σ per-judge reliability); the thesis is carried by **CARE** (arXiv:2603.00039) and **CyclicJudge** (arXiv:2603.01865). The Qian cite is dropped for this point.
+- **Fabricated numbers.** Bean et al. (arXiv:2511.04703): real figures are ~6% define the construct / <10% report stats (not "53%/16%"). MiniCheck's "7B@77.4%" belongs to a later Bespoke model, not arXiv:2404.10774.
+- **Attribution fixes:** JudgeBench first author **Sijun Tan**; Judge's Verdict **Steve Han**; "ATLAS"/"ImpossibleBench"/"SE-Jury" are framework names, not paper titles. All IDs resolve — including every 2026 future-ID (2512.01786, 2602.16610, 2603.00039, 2603.01865).
+
+### 11.6 Phase-2 build plan + Standards compliance
+
+Build: (1) **model adapters** — an Ollama `generate`/judge adapter + a Claude adapter satisfying the kernel's injected callables (the bridge from Phase-1's injected stubs to real models); (2) the **calibration puzzle set** (§11.3); (3) the **judge-profiling harness** — runs the §11.1 6-metric admission test across the panel → per-model `JudgeProfile`s → role assignment; (4) the **quant measurement** (§11.2). Standards: **PIN_PER_STEP** (pin model+quant+prompt+fixture-hash per profile run — profiles must be replayable); **EXTERNAL_VERIFIER** (the panel is cross-family + the citation-verify pass instantiated it on the research again — and *caught the contradicted number*); **UNCERTAINTY_GATED_HUMANS** (the genuine Phase-2 decisions are gated to the director — §11.7); **DECOMPOSE_BY_SECRETS** (gold labels live with the grader, not the profiled model).
+
+### 11.7 Held for the build checkpoint (director decisions)
+
+Empirical/qualitative calls deferred to the build, not pre-decided: the **final panel composition** (which of qwen3.6 / mistral-small / gemma4 / aya-expanse / granite4.1 / devstral seat, after admission scores), the **calibration items** themselves (authoring the ~40–60 puzzles), and the **quant levels** to sweep. The harness is built first (model-mocked, tested); the genuine decisions are made from its output.
