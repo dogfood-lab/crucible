@@ -1,0 +1,24 @@
+[
+  {
+    "id": "retest-paraphrase-a-0001",
+    "category": "test_retest",
+    "construct": "stochastic-noise reliability (re-run k times)",
+    "confound_controlled": "item difficulty (same underlying task, paraphrased surface)",
+    "prompt": "How many sides does a hexagon have? Answer with the number only.",
+    "gold": "6",
+    "expected_pass": {"weak": true, "strong": true},
+    "difficulty": -2.5,
+    "metadata": {"why": "re-run k times; high per-item variance -> quarantine. Variance measured elsewhere (§11.3)."}
+  },
+  {
+    "id": "retest-paraphrase-b-0002",
+    "category": "test_retest",
+    "construct": "stochastic-noise reliability (re-run k times)",
+    "confound_controlled": "item difficulty (paraphrase of the same fact)",
+    "prompt": "A hexagon has how many sides? Reply with the integer only.",
+    "gold": "6",
+    "expected_pass": {"weak": true, "strong": true},
+    "difficulty": -2.5,
+    "metadata": {"why": "paired with retest-paraphrase-a; agreement across paraphrases probes reliability"}
+  }
+]

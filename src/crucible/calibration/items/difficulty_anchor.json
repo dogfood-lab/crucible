@@ -1,0 +1,38 @@
+[
+  {
+    "id": "anchor-easy-0001",
+    "category": "difficulty_anchor",
+    "construct": "latent-ability scale anchor (low b)",
+    "confound_controlled": "format effects (plain single-number answer)",
+    "prompt": "What is 12 divided by 4? Answer with the number only.",
+    "gold": "3",
+    "expected_pass": {"weak": true, "strong": true},
+    "difficulty": -2.0,
+    "discrimination": 1.0,
+    "metadata": {"why": "easy IRT anchor; almost everyone passes", "source": "tinyBenchmarks (Maia Polo et al. 2024, arXiv:2402.14992)"}
+  },
+  {
+    "id": "anchor-medium-0002",
+    "category": "difficulty_anchor",
+    "construct": "latent-ability scale anchor (mid b)",
+    "confound_controlled": "format effects",
+    "prompt": "What is 13 times 7? Answer with the number only.",
+    "gold": "91",
+    "expected_pass": {"weak": false, "strong": true},
+    "difficulty": 0.0,
+    "discrimination": 1.1,
+    "metadata": {"why": "mid IRT anchor for the ability scale"}
+  },
+  {
+    "id": "anchor-hard-0003",
+    "category": "difficulty_anchor",
+    "construct": "latent-ability scale anchor (high b)",
+    "confound_controlled": "format effects",
+    "prompt": "Compute the remainder when 2^20 is divided by 1000. Answer with the number only.",
+    "gold": "576",
+    "expected_pass": {"weak": false, "strong": true},
+    "difficulty": 2.0,
+    "discrimination": 1.2,
+    "metadata": {"why": "hard IRT anchor; spreads the top of the scale", "source": "ATLAS / Adaptive Testing (Peiyu Li et al. 2025, arXiv:2511.04689)"}
+  }
+]

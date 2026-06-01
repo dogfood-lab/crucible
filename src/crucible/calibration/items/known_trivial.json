@@ -1,0 +1,35 @@
+[
+  {
+    "id": "trivial-arith-0001",
+    "category": "known_trivial",
+    "construct": "harness wiring + numeric answer parsing",
+    "confound_controlled": "task difficulty (so a failure isolates the instrument, not the model)",
+    "prompt": "What is 2 + 2? Answer with the integer only.",
+    "gold": "4",
+    "expected_pass": {"weak": true, "medium": true, "strong": true},
+    "difficulty": -4.0,
+    "metadata": {"why": "attention check; any tier failing means parsing/scoring is broken"}
+  },
+  {
+    "id": "trivial-echo-0002",
+    "category": "known_trivial",
+    "construct": "instruction-following + exact-match scoring path",
+    "confound_controlled": "reasoning depth (none required)",
+    "prompt": "Reply with exactly the word: ACKNOWLEDGED",
+    "gold": "ACKNOWLEDGED",
+    "expected_pass": {"weak": true, "medium": true, "strong": true},
+    "difficulty": -3.5,
+    "metadata": {"why": "verifies the exact-match grader and the prompt->response plumbing"}
+  },
+  {
+    "id": "trivial-pick-0003",
+    "category": "known_trivial",
+    "construct": "multiple-choice option extraction",
+    "confound_controlled": "world knowledge (the answer is given in the prompt)",
+    "prompt": "Pick the larger number: (A) 7  (B) 3. Answer with the letter only.",
+    "gold": "A",
+    "expected_pass": {"weak": true, "medium": true, "strong": true},
+    "difficulty": -3.0,
+    "metadata": {"why": "verifies single-letter MCQ parsing"}
+  }
+]
