@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-01
 **Source:** Fourth study swarm dispatch (Phase-1-prep, research-grounded advisor protocol)
-**Question:** Is there 2024–2026 evidence quantifying the gain (accuracy/reliability) and cost (latency/token/$) of adding an adversarial Critic / debate stage to an LLM judging pipeline, vs single-judge and vs jury/PoLL? Decide whether crucible's Phase 1 role contract should make Critic first-class, optional, or a deferred stub.
+**Question:** Is there 2024–2026 evidence quantifying the gain (accuracy/reliability) and cost (latency/token/$) of adding an adversarial Critic / debate stage to an LLM judging pipeline, vs single-judge and vs jury/PoLL? Decide whether ai-crucible's Phase 1 role contract should make Critic first-class, optional, or a deferred stub.
 
 ---
 
@@ -32,9 +32,9 @@
 
 ---
 
-## Recommendation for Crucible's Phase 1 role contract: **Optional stage** (interface-reserved, default-off, gated).
+## Recommendation for AI Crucible's Phase 1 role contract: **Optional stage** (interface-reserved, default-off, gated).
 
-Make Critic a **first-class slot in the role-interface contract but a non-default, toggleable stage** — not a fully built first-class role, not a pure deferred stub. Evidence: the *value* of a Critic is real but **narrow and conditional** (Hu 2025: +5pp on hard/ambiguous items, ~0 on easy ones; Kenton 2024: gains concentrate on information-asymmetry tasks), while the *cost* is a flat **3–5× token multiplier** (S2-MAD) AND the *risk* is a measurable accuracy *regression* via conformity/answer-flipping (Estornell 2025: up to −12pp) that worsens precisely when the Solver is strong and the Critic/Judge weaker — Crucible's frontier-model setting. Worse, matched-budget analysis (2604.02460) suggests much of debate's apparent edge is just extra compute a stronger single Judge could spend directly. So: define the Critic message schema now (cheap, prevents a Phase-2 contract break), wire it as a per-puzzle opt-in stage, and **default it off**, routing to single-Judge or jury/PoLL. **Revisit when** you have logged Crucible puzzles showing (i) high Judge disagreement/variance or low human-agreement on a task class, or (ii) genuine Solver-Judge information asymmetry — the two conditions the literature says actually convert Critic spend into reliability. If you do enable it, anonymize debater identity (**D3, arXiv:2410.04663** — see correction below) and use adaptive early-stopping (Hu 2025), and always benchmark against a **token-matched** single Judge, never an unmatched one.
+Make Critic a **first-class slot in the role-interface contract but a non-default, toggleable stage** — not a fully built first-class role, not a pure deferred stub. Evidence: the *value* of a Critic is real but **narrow and conditional** (Hu 2025: +5pp on hard/ambiguous items, ~0 on easy ones; Kenton 2024: gains concentrate on information-asymmetry tasks), while the *cost* is a flat **3–5× token multiplier** (S2-MAD) AND the *risk* is a measurable accuracy *regression* via conformity/answer-flipping (Estornell 2025: up to −12pp) that worsens precisely when the Solver is strong and the Critic/Judge weaker — AI Crucible's frontier-model setting. Worse, matched-budget analysis (2604.02460) suggests much of debate's apparent edge is just extra compute a stronger single Judge could spend directly. So: define the Critic message schema now (cheap, prevents a Phase-2 contract break), wire it as a per-puzzle opt-in stage, and **default it off**, routing to single-Judge or jury/PoLL. **Revisit when** you have logged AI Crucible puzzles showing (i) high Judge disagreement/variance or low human-agreement on a task class, or (ii) genuine Solver-Judge information asymmetry — the two conditions the literature says actually convert Critic spend into reliability. If you do enable it, anonymize debater identity (**D3, arXiv:2410.04663** — see correction below) and use adaptive early-stopping (Hu 2025), and always benchmark against a **token-matched** single Judge, never an unmatched one.
 
 ---
 

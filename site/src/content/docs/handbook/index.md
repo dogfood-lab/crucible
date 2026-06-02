@@ -1,11 +1,11 @@
 ---
-title: Welcome to crucible
+title: Welcome to ai-crucible
 description: A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.
 sidebar:
   order: 0
 ---
 
-**crucible** is a diagnostic adversarial game for frontier large language models — a measurement
+**ai-crucible** is a diagnostic adversarial game for frontier large language models — a measurement
 instrument that happens to be fun. One model session crafts puzzles that target real,
 currently-observed capability gaps; another attempts them; a policy-enforced kernel mediates every
 move, grades the result against a hidden oracle, and curates a living catalog of puzzles as the
@@ -14,7 +14,7 @@ academic results, observed failures in the field — not synthetic toy problems.
 
 ## The loop: Designer → Solver → Judge
 
-Crucible runs a three-stage cycle around a single shared state object:
+AI Crucible runs a three-stage cycle around a single shared state object:
 
 - **Designer** generates or refines a puzzle candidate aimed at a specific, documented capability
   gap. The Designer never sees the answer key — only the gap it is trying to provoke.
@@ -29,7 +29,7 @@ cannot game a target it cannot perceive.
 
 ## The load-bearing idea
 
-Most benchmarks treat any unconventional path to a passing result as "cheating." Crucible refuses
+Most benchmarks treat any unconventional path to a passing result as "cheating." AI Crucible refuses
 that flattening. It distinguishes three categories of off-the-beaten-path problem-solving:
 
 - **Elegance** — solving the task in fewer steps than the canonical path, via a cleaner approach.
@@ -39,7 +39,7 @@ that flattening. It distinguishes three categories of off-the-beaten-path proble
 - **Answer-bypass** — reaching directly for the answer artifact, the test oracle, or the solution
   key, circumventing the reasoning the puzzle exists to test. *Penalized*, heavily.
 
-The first two are the capabilities crucible exists to characterize. A model that finds tight,
+The first two are the capabilities ai-crucible exists to characterize. A model that finds tight,
 unforeseen paths through constraint space is doing exactly what makes it valuable. The narrow
 diagnostic concern is circumvention: when the environment hands over the answer, does the model take
 it? That pollutes the signal, so it is penalized — and the penalty is sized so a single critical
@@ -48,7 +48,7 @@ vice to punish.
 
 ## The sealed measurement boundary
 
-Because crucible is also a measurement instrument, anything the model can perceive as influencing its
+Because ai-crucible is also a measurement instrument, anything the model can perceive as influencing its
 grade is something it can optimize toward. So motivation and measurement never share a context
 window. The scored context the model solves in stays deployment-shaped and framing-neutral; the
 competitive "chrome" (rank, leaderboard, standings) lives in a separate object that is never

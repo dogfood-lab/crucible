@@ -1,4 +1,4 @@
-"""Tests for the Crucible scoring layer (stats / oracle / judge panel).
+"""Tests for the AI Crucible scoring layer (stats / oracle / judge panel).
 
 Covers the load-bearing behaviors the research grounding pins:
 
@@ -24,7 +24,8 @@ from collections.abc import Awaitable, Callable
 
 import pytest
 
-from crucible.scoring import (
+from ai_crucible.characterize.aggregate import SeatedJudge, SeatedPanel
+from ai_crucible.scoring import (
     CRITICAL_FLAVOR,
     JudgePanel,
     OracleOutcome,
@@ -35,9 +36,10 @@ from crucible.scoring import (
     mcnemar_exact,
     pass_hat_k,
     reduce_scores,
+    weighted_judge,
     wilson_interval,
 )
-from crucible.types import (
+from ai_crucible.types import (
     AttemptState,
     GoodhartFlavor,
     Penalty,
@@ -620,6 +622,146 @@ def test_reduce_unknown_method_raises() -> None:
 def test_reduce_median_on_non_numeric_raises() -> None:
     with pytest.raises(ValueError, match="numeric"):
         reduce_scores([Score(value="legit"), Score(value="nope")], "median")
+
+
+# --------------------------------------------------------------------------- #
+# judge_panel — reliability-weighted reducer (CARE, §11.4) + the seated bridge
+# --------------------------------------------------------------------------- #
+
+
+def test_reduce_weighted_reliable_dissent_beats_unreliable_majority() -> None:
+    """CARE (§11.4): a reliable dissent (w=0.9 False) out-weighs an unreliable agreeing
+    majority (two w=0.1 Trues) — unlike plain head-count majority."""
+    out = reduce_scores(
+        [
+            Score(value=True, metadata={"judge_weight": 0.1}),
+            Score(value=True, metadata={"judge_weight": 0.1}),
+            Score(value=False, metadata={"judge_weight": 0.9}),
+        ],
+        "weighted",
+    )
+    assert out.value is False
+    assert out.metadata["margin"] == pytest.approx(0.9 / 1.1)
+    assert out.metadata["escalate"] is False
+    assert out.metadata["weights"] == [0.1, 0.1, 0.9]
+    assert out.metadata["reducer"] == "weighted"
+
+
+def test_reduce_weighted_defaults_to_equal_weight() -> None:
+    """No judge_weight in metadata → every judge weighs 1.0 (≡ majority by weight)."""
+    out = reduce_scores(
+        [Score(value=True), Score(value=True), Score(value=False)], "weighted"
+    )
+    assert out.value is True
+    assert out.metadata["weights"] == [1.0, 1.0, 1.0]
+    assert out.metadata["margin"] == pytest.approx(2 / 3)
+
+
+def test_reduce_weighted_escalates_on_thin_margin() -> None:
+    """A weighted dead-even split flags escalate (route to the Designer, §11.1)."""
+    out = reduce_scores(
+        [
+            Score(value="pass", metadata={"judge_weight": 0.5}),
+            Score(value="fail", metadata={"judge_weight": 0.5}),
+        ],
+        "weighted",
+    )
+    assert out.metadata["margin"] == pytest.approx(0.5)
+    assert out.metadata["escalate"] is True
+
+
+def test_reduce_weighted_all_zero_weights_raises() -> None:
+    with pytest.raises(ValueError, match="weighted reducer"):
+        reduce_scores([Score(value=True, metadata={"judge_weight": 0.0})], "weighted")
+
+
+def test_weighted_judge_stamps_weight_and_preserves_family(
+    scoring_attempt: AttemptState,
+) -> None:
+    wj = weighted_judge(make_judge("qwen", True), 0.7)
+    assert judge_family(wj) == "qwen"
+    score = asyncio.run(wj(scoring_attempt))
+    assert score.metadata["judge_weight"] == 0.7
+    assert score.value is True
+
+
+def test_weighted_judge_family_override(scoring_attempt: AttemptState) -> None:
+    wj = weighted_judge(make_judge(None, True), 0.5, family="mistral")
+    assert judge_family(wj) == "mistral"
+
+
+def test_weighted_judge_rejects_negative_weight() -> None:
+    with pytest.raises(ValueError, match="weight must be >= 0"):
+        weighted_judge(make_judge("qwen", True), -0.1)
+
+
+def _seated_for(model_id: str, weight: float, family: str) -> SeatedJudge:
+    return SeatedJudge(model_id=model_id, reliability_weight=weight, family=family)
+
+
+def test_panel_from_seated_weights_drive_verdict(
+    scoring_attempt: AttemptState,
+) -> None:
+    """JudgePanel.from_seated wires each seat's reliability weight into the weighted
+    reducer: a reliable dissenter beats two unreliable agreers (§11.4)."""
+    seated = SeatedPanel(
+        seats=[
+            _seated_for("m_qwen", 0.9, "qwen"),
+            _seated_for("m_mistral", 0.1, "mistral"),
+            _seated_for("m_cohere", 0.1, "cohere"),
+        ],
+        submodular=True,
+        meets_quorum=True,
+        escalate=False,
+        not_seated=[],
+        dropped_redundant=[],
+        threshold=0.25,
+        min_judges=3,
+        notes=[],
+    )
+    votes = {"m_qwen": False, "m_mistral": True, "m_cohere": True}
+
+    def judge_for(model_id: str):
+        async def _j(_a: AttemptState) -> Score:
+            return Score(value=votes[model_id])
+
+        return _j
+
+    panel = JudgePanel.from_seated(seated, judge_for, generator_family="claude")
+    result = asyncio.run(panel.score(scoring_attempt))
+    assert result.value is False  # 0.9 (False) > 0.1 + 0.1 (True)
+    assert result.metadata["reducer"] == "weighted"
+    assert result.metadata["margin"] == pytest.approx(0.9 / 1.1)
+    assert result.metadata["escalate"] is False
+
+
+def test_panel_from_seated_excludes_generator_family(
+    scoring_attempt: AttemptState,
+) -> None:
+    """from_seated tags each judge with its seat family, so EXTERNAL_VERIFIER exclusion
+    still drops a seat sharing the generator's family (§10.2)."""
+    seated = SeatedPanel(
+        seats=[_seated_for("m_qwen", 1.0, "qwen"), _seated_for("m_claude", 1.0, "claude")],
+        submodular=True,
+        meets_quorum=True,
+        escalate=False,
+        not_seated=[],
+        dropped_redundant=[],
+        threshold=0.25,
+        min_judges=3,
+        notes=[],
+    )
+
+    def judge_for(_model_id: str):
+        async def _j(_a: AttemptState) -> Score:
+            return Score(value=True)
+
+        return _j
+
+    panel = JudgePanel.from_seated(seated, judge_for, generator_family="claude")
+    result = asyncio.run(panel.score(scoring_attempt))
+    assert result.metadata["excluded"] == ["claude"]
+    assert result.metadata["eligible_count"] == 1
 
 
 # --------------------------------------------------------------------------- #

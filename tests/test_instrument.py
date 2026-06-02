@@ -1,4 +1,4 @@
-"""Tests for the instrument-quality scaffolding (crucible.instrument, §9).
+"""Tests for the instrument-quality scaffolding (ai_crucible.instrument, §9).
 
 Covers, per the build contract:
 - aspredicted_template has 9 questions
@@ -21,7 +21,7 @@ import json
 import numpy as np
 import pytest
 
-from crucible.instrument import (
+from ai_crucible.instrument import (
     ASPREDICTED_QUESTION_IDS,
     SUT,
     InspectTaskError,
@@ -103,7 +103,7 @@ def test_render_preregistration_is_deterministic_and_complete():
     md1 = render_preregistration(answers)
     md2 = render_preregistration(answers)
     assert md1 == md2  # PIN_PER_STEP: same answers -> same bytes
-    assert md1.startswith("# Crucible — Pre-registration")
+    assert md1.startswith("# AI Crucible — Pre-registration")
     # All nine questions render.
     for q in template["questions"]:
         assert f"Q{q['number']}." in md1
@@ -526,7 +526,7 @@ def test_to_inspect_task_seals_the_oracle(sample_meta):
     task = to_inspect_task(sample_meta, "prompt text")
     assert task["dataset"][0]["target"] == ""  # Solver never sees the answer
     assert isinstance(task["scorer"], str)  # a reference string
-    assert task["scorer"].startswith("crucible/oracle_scorer#")
+    assert task["scorer"].startswith("ai_crucible/oracle_scorer#")
     assert sample_meta.puzzle_id in task["scorer"]
     # The serialised task is JSON-roundtrippable (auditor tooling consumes it).
     dumped = json.dumps(task)
@@ -548,9 +548,9 @@ def test_to_inspect_task_rejects_empty_prompt(sample_meta):
 
 def test_two_repo_layout_describes_the_split():
     layout = two_repo_layout()
-    assert set(layout["repos"].keys()) == {"crucible-harness", "crucible-results"}
+    assert set(layout["repos"].keys()) == {"ai_crucible-harness", "ai_crucible-results"}
     # The pre-registration + provenance live on the results side, not the harness.
-    results_raw = " ".join(layout["repos"]["crucible-results"]["contains"])
+    results_raw = " ".join(layout["repos"]["ai_crucible-results"]["contains"])
     results_lc = results_raw.lower()
     assert "pre-registration" in results_lc or "preregistration" in results_lc
     assert "TUNING.md" in results_raw

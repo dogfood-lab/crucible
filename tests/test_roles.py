@@ -1,4 +1,4 @@
-"""Tests for the concrete roles (crucible.roles).
+"""Tests for the concrete roles (ai_crucible.roles).
 
 Async roles are driven with ``anyio.run`` (no pytest-asyncio dependency, and
 ``anyio`` ships with inspect-ai). The model-I/O choke point is exercised with a
@@ -19,8 +19,8 @@ from __future__ import annotations
 import anyio
 import pytest
 
-from crucible.budget import BudgetGovernor
-from crucible.roles import (
+from ai_crucible.budget import BudgetGovernor
+from ai_crucible.roles import (
     ChromeAccessError,
     CohortSolver,
     Critic,
@@ -28,7 +28,7 @@ from crucible.roles import (
     Judge,
     Solver,
 )
-from crucible.types import (
+from ai_crucible.types import (
     AttemptState,
     Budget,
     Chrome,
@@ -231,7 +231,7 @@ def _leaking_role(content: str):
         name = RoleName.SOLVER
 
         async def act(self, state: AttemptState) -> AttemptState:
-            from crucible.roles import _ChromeGuard
+            from ai_crucible.roles import _ChromeGuard
 
             with _ChromeGuard(state):
                 # Violation: pull a Tier-3 chrome VALUE into the scored context as
@@ -248,7 +248,7 @@ def test_prose_rank_leak_into_messages_goes_red() -> None:
 
     This is the leak the OLD ``chrome_rank``-keyed test could not see: there is no
     literal ``"chrome"`` token here, so the previous weak guard passed it. The
-    guard now delegates to :func:`crucible.engagement.assert_no_chrome_leak`, whose
+    guard now delegates to :func:`ai_crucible.engagement.assert_no_chrome_leak`, whose
     token-based match catches the bare rank value however it is phrased (§10.1(e))."""
     state = _attempt()
     state.chrome = Chrome(rank=7, cohort_size=12)

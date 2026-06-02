@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "crucible"
+name = "ai-crucible"
 version = "0.2.0"
 description = "Diagnostic adversarial game for frontier LLMs — a policy-enforced kernel that mediates a Designer/Solver/Judge cycle, scores against a hidden oracle, and curates a Lab/Arena/Regression catalog."
 readme = "README.md"
@@ -34,11 +34,14 @@ stats = ["statsmodels>=0.14"]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11"]
 
 [project.urls]
-Homepage = "https://github.com/dogfood-lab/crucible"
-Repository = "https://github.com/dogfood-lab/crucible"
+Homepage = "https://github.com/dogfood-lab/ai-crucible"
+Repository = "https://github.com/dogfood-lab/ai-crucible"
+
+[project.scripts]
+ai-crucible = "ai_crucible.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/crucible"]
+packages = ["src/ai_crucible"]
 
 [tool.ruff]
 line-length = 100
@@ -63,5 +66,5 @@ fail_under = 60
 
 [tool.mypy]
 python_version = "3.11"
-packages = ["crucible"]
+packages = ["ai_crucible"]
 ignore_missing_imports = true

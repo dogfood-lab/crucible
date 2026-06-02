@@ -1,6 +1,6 @@
 # Security Policy
 
-Crucible is a diagnostic adversarial game **and** a measurement instrument. Its
+AI Crucible is a diagnostic adversarial game **and** a measurement instrument. Its
 threat model is unusual: the primary adversary is the very model being measured,
 which has both the capability and (under the wrong framing) the incentive to
 reach the answer key or to detect and game the measurement. This document states
@@ -47,7 +47,7 @@ is **defense-in-depth on top of** that boundary, never the boundary itself.
 
 ### 2. The sealed measurement boundary (§10.1(d), §10.5)
 
-Crucible measures behavior, so anything the model can perceive as influencing the
+AI Crucible measures behavior, so anything the model can perceive as influencing the
 grade is something it can game. The empirical signal is stark: prompt framing
 alone moves model choices from 4.3% → 68.8% (Wang & Zhang 2026, arXiv:2603.19282);
 a single prompt change moves cheating from 92% → 1% (Zhong et al. 2025,
@@ -56,14 +56,14 @@ ImpossibleBench, arXiv:2510.20270); and adding naive oversight can make scheming
 protected by a hard separation enforced in code:
 
 - **The oracle never enters the Solver context.** `load_puzzle`
-  (`src/crucible/puzzle.py`) reads only `meta.json`, `prompt`, and `setup_script`;
+  (`src/ai_crucible/puzzle.py`) reads only `meta.json`, `prompt`, and `setup_script`;
   it has **no oracle field** and refuses to even resolve an `oracle/` artifact.
   As defense-in-depth it rejects a `meta.json` that smuggles an oracle-bearing
   key (`STATE_ORACLE_IN_META`). The answer is graded by a different model family,
   out of band, with the Solver's reasoning hidden.
 - **Motivation chrome never enters the scored context.** Rank, leaderboard,
   catalog standings, and prizes live in a separate `Chrome` object
-  (`src/crucible/types.py`) that is **never serialized into `AttemptState.messages`**
+  (`src/ai_crucible/types.py`) that is **never serialized into `AttemptState.messages`**
   — the context window the model actually solves in. The scored context stays
   deployment-shaped and framing-neutral (Tier 1). Engagement framing (Tier 2)
   and chrome (Tier 3) are structurally segregated. Keeping these as separate
@@ -102,10 +102,10 @@ its own consumption.
 
 ## No secrets, no telemetry
 
-- Crucible ships **no bundled credentials, API keys, or tokens**. Model-provider
+- AI Crucible ships **no bundled credentials, API keys, or tokens**. Model-provider
   keys are supplied by the operator via environment variables at runtime and are
   never written to the repo or to trace logs.
-- Crucible sends **no telemetry**. It makes no outbound network calls of its own;
+- AI Crucible sends **no telemetry**. It makes no outbound network calls of its own;
   the only external calls are the model-provider requests the operator configures.
   Solver containers run `network_mode: none`.
 - Trace records (Inspect `EvalLog` shape) are written **locally**. Large blobs are
@@ -114,7 +114,7 @@ its own consumption.
 
 ## Supported versions
 
-Crucible is pre-1.0 and public as of the Phase-1 milestone (v0.2.0). Only the
+AI Crucible is pre-1.0 and public as of the Phase-1 milestone (v0.2.0). Only the
 current `main` / active build branch receives security fixes. There is no
 back-port guarantee for tagged pre-releases.
 
@@ -128,13 +128,13 @@ back-port guarantee for tagged pre-releases.
 Please report security issues **privately** — do not open a public issue for a
 vulnerability.
 
-- Preferred: open a [GitHub private security advisory](https://github.com/dogfood-lab/crucible/security/advisories/new)
+- Preferred: open a [GitHub private security advisory](https://github.com/dogfood-lab/ai-crucible/security/advisories/new)
   on this repository.
 - Alternatively: email **64996768+mcp-tool-shop@users.noreply.github.com** with
   `[crucible-security]` in the subject.
 
 Please include a description, reproduction steps, and the affected
-commit/branch. We aim to acknowledge within a few business days. Because crucible
+commit/branch. We aim to acknowledge within a few business days. Because ai-crucible
 is a measurement instrument, reports that demonstrate a way to **breach the sealed
 boundary** (reach the oracle from Solver-visible state, or leak motivation chrome
 into the scored context) are treated as high severity even when no traditional

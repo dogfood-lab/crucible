@@ -3,16 +3,16 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="crucible" width="400" />
+  <img src="https://raw.githubusercontent.com/dogfood-lab/ai-crucible/main/assets/logo.png" alt="ai-crucible" width="400" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/python-3.11%E2%80%933.13-blue.svg" alt="Python 3.11–3.13" />
   <img src="https://img.shields.io/badge/coverage-96%25-brightgreen.svg" alt="Coverage 96%" />
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.2.0-orange.svg" alt="Version 0.2.0" /></a>
-  <a href="https://dogfood-lab.github.io/crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
+  <a href="https://dogfood-lab.github.io/ai-crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
 </p>
 
 <p align="center"><b>A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.</b></p>
@@ -49,7 +49,20 @@ Crucible es una **capa de políticas delgada sobre [Inspect AI](https://inspect.
 
 El límite sellado se ejecuta en tres niveles: **Nivel 1** contexto evaluado (con la forma de la implementación, neutral en cuanto a la formulación), **Nivel 2** formulación de la interacción (analizada para detectar contaminación en cada versión), **Nivel 3** elementos de la interfaz (clasificación/tabla de posiciones, solo interfaz de usuario orientada al usuario, nunca en un contexto en el que el modelo resuelve el problema). La justificación completa del diseño, con citas, se encuentra en [`docs/research-grounding.md`](docs/research-grounding.md).
 
-## Inicio rápido
+## Instalar
+
+```bash
+# As a Python library + CLI (PyPI):
+pip install ai-crucible          # or: uv pip install ai-crucible
+ai-crucible --help
+
+# Or zero-prerequisite via npx — downloads a verified binary, no Python needed:
+npx @dogfood-lab/ai-crucible --help
+```
+
+> **Versión preliminar para investigación (v0.2.x).** La prueba alternativa ω del jurado sigue siendo un *modelo circular de jurado con bootstrapping* hasta que se realiza una ronda de etiquetado manual, por lo que los jurados presentes son **provisionales** y el jurado completo **se amplía hasta convertirse en un Claude Designer** cuando no se alcanza el quórum. Consulte la [hoja de resultados](SCORECARD.md) para obtener los resultados honestos y objetivos de la evaluación.
+
+## Inicio rápido (a partir del código fuente)
 
 Crucible utiliza [`uv`](https://docs.astral.sh/uv/) para la gestión del entorno y las dependencias. Python **3.11+**.
 
@@ -58,7 +71,7 @@ Crucible utiliza [`uv`](https://docs.astral.sh/uv/) para la gestión del entorno
 uv sync --extra dev --extra stats
 
 # Run the test suite (with the coverage gate)
-uv run pytest --cov=crucible --cov-report=term-missing
+uv run pytest --cov=ai_crucible --cov-report=term-missing
 
 # Lint
 uv run ruff check .

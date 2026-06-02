@@ -1,9 +1,9 @@
 """GRADING-SIDE ONLY — sealed oracle for seed-sulzbach-55252.
 
 This file lives on the *grading side* (§10.4). It is NEVER loaded into
-Solver-visible state: `crucible.puzzle.load_puzzle` reads only meta.json, prompt,
+Solver-visible state: `ai_crucible.puzzle.load_puzzle` reads only meta.json, prompt,
 and setup_script, and explicitly refuses any artifact named `oracle` (see the
-`_ORACLE_NAMES` guard in src/crucible/puzzle.py). The Solver container has zero
+`_ORACLE_NAMES` guard in src/ai_crucible/puzzle.py). The Solver container has zero
 filesystem/network path to this directory; the kernel copies the Solver workdir
 OUT and grades it in a fresh container after the Solver halts (SWE-bench timing).
 

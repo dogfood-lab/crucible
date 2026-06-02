@@ -1,0 +1,1583 @@
+[
+  {
+    "id": "pair-00-add",
+    "category": "difficulty_anchor",
+    "construct": "judge basic addition",
+    "confound_controlled": "no domain knowledge",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 7 + 6?\nCandidate A: 13\nCandidate B: 12\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.1,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "off_by_one",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-01-cap",
+    "category": "difficulty_anchor",
+    "construct": "judge a common-knowledge fact",
+    "confound_controlled": "common knowledge",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the capital of Japan?\nCandidate A: Kyoto\nCandidate B: Tokyo\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.12,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "plausible_wrong_fact",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-02-rev",
+    "category": "difficulty_anchor",
+    "construct": "judge a string reversal",
+    "confound_controlled": "mechanical",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the word 'star' reversed?\nCandidate A: rats\nCandidate B: rast\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.15,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "transposition",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-03-mult",
+    "category": "difficulty_anchor",
+    "construct": "judge single-digit multiplication",
+    "confound_controlled": "mechanical",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 8 x 7?\nCandidate A: 54\nCandidate B: 56\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.15,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "near_miss_product",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-04-even",
+    "category": "difficulty_anchor",
+    "construct": "judge a parity claim",
+    "confound_controlled": "mechanical",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Is 17 an even number?\nCandidate A: No\nCandidate B: Yes\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.12,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "category_error",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-05-div",
+    "category": "difficulty_anchor",
+    "construct": "judge exact division",
+    "confound_controlled": "mechanical",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 48 / 6?\nCandidate A: 7\nCandidate B: 8\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.15,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "near_miss_quotient",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-06-avgspeed",
+    "category": "known_diagnostic",
+    "construct": "judge a rate calculation",
+    "confound_controlled": "must compute, not eyeball units",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A car covers 150 km in 2.5 hours. What is its average speed?\nCandidate A: 60 km/h\nCandidate B: 75 km/h\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "wrong_operation",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-07-listcomp",
+    "category": "known_diagnostic",
+    "construct": "judge a Python list-comp trace",
+    "confound_controlled": "trace vs pattern-match",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What does [n*n for n in [2,3,4]] evaluate to?\nCandidate A: [4, 6, 8]\nCandidate B: [4, 9, 16]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "squared_vs_doubled",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-08-loop",
+    "category": "known_diagnostic",
+    "construct": "judge a loop accumulation trace",
+    "confound_controlled": "execute, don't guess",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: x = 0; for i in range(5): x += i. What is x after the loop?\nCandidate A: 10\nCandidate B: 15\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.5,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "inclusive_range_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-09-pct",
+    "category": "known_diagnostic",
+    "construct": "judge a percentage",
+    "confound_controlled": "arithmetic, not plausibility",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 15% of 200?\nCandidate A: 35\nCandidate B: 30\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.4,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "near_miss_percent",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-10-range5",
+    "category": "known_diagnostic",
+    "construct": "judge an inclusive count",
+    "confound_controlled": "off-by-one awareness",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many integers are there from 3 to 9 inclusive?\nCandidate A: 7\nCandidate B: 6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.5,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "off_by_one",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-11-syll1",
+    "category": "known_diagnostic",
+    "construct": "judge a valid universal syllogism",
+    "confound_controlled": "deductive validity",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: All cats are mammals. All mammals are animals. Does it follow that all cats are animals?\nCandidate A: No\nCandidate B: Yes\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.35,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "valid_called_invalid",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-12-unitkm",
+    "category": "known_diagnostic",
+    "construct": "judge a unit conversion",
+    "confound_controlled": "check the factor, not the shape",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Convert 3 kilometers to meters.\nCandidate A: 3000\nCandidate B: 300\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "magnitude_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-13-frac",
+    "category": "known_diagnostic",
+    "construct": "judge fraction addition",
+    "confound_controlled": "common-denominator step",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 1/2 + 1/3?\nCandidate A: 2/5\nCandidate B: 5/6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "added_numerators_denominators",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-14-primecount",
+    "category": "known_diagnostic",
+    "construct": "judge a small prime count",
+    "confound_controlled": "definition of prime",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many prime numbers are there between 1 and 10?\nCandidate A: 4\nCandidate B: 5\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "counted_one_as_prime",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-15-grounded",
+    "category": "known_diagnostic",
+    "construct": "judge a grounded retrieval",
+    "confound_controlled": "value is stated in the prompt",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A config file contains: TIMEOUT = 45. What is the value of TIMEOUT?\nCandidate A: 30\nCandidate B: 45\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "fabricated_default",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-16-median",
+    "category": "known_diagnostic",
+    "construct": "judge a median",
+    "confound_controlled": "sort-then-pick, not mean",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the median of [3, 1, 4, 1, 5]?\nCandidate A: 3\nCandidate B: 2.8\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "reported_mean_as_median",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-17-area",
+    "category": "known_diagnostic",
+    "construct": "judge a rectangle area",
+    "confound_controlled": "multiply the right pair",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A rectangle is 6 cm by 4 cm. What is its area?\nCandidate A: 20 cm^2\nCandidate B: 24 cm^2\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "perimeter_vs_area",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-18-daysweek",
+    "category": "known_diagnostic",
+    "construct": "judge a multiplication word problem",
+    "confound_controlled": "set up the product",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many hours are there in 3 days?\nCandidate A: 72\nCandidate B: 36\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.4,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "halved_factor",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-19-strlen",
+    "category": "known_diagnostic",
+    "construct": "judge a string length",
+    "confound_controlled": "count, don't approximate",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many characters are in the word 'banana'?\nCandidate A: 5\nCandidate B: 6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.4,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "off_by_one",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-20-compare",
+    "category": "known_diagnostic",
+    "construct": "judge a decimal comparison",
+    "confound_controlled": "place value",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Which is larger, 0.9 or 0.85?\nCandidate A: 0.9\nCandidate B: 0.85\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.5,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "longer_looks_bigger",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-21-modulo",
+    "category": "known_diagnostic",
+    "construct": "judge a modulo result",
+    "confound_controlled": "remainder, not quotient",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 17 mod 5?\nCandidate A: 3\nCandidate B: 2\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "near_miss_remainder",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-22-sumlist",
+    "category": "known_diagnostic",
+    "construct": "judge a list sum",
+    "confound_controlled": "add all terms",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the sum of [10, 20, 30, 40]?\nCandidate A: 100\nCandidate B: 90\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.4,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "dropped_a_term",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-23-boollogic",
+    "category": "known_diagnostic",
+    "construct": "judge a boolean expression",
+    "confound_controlled": "operator precedence",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Evaluate: True and False or True.\nCandidate A: False\nCandidate B: True\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "precedence_error",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-24-indexing",
+    "category": "known_diagnostic",
+    "construct": "judge zero-based indexing",
+    "confound_controlled": "0-based access",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: For lst = ['a','b','c','d'], what is lst[2]?\nCandidate A: c\nCandidate B: b\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.5,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "off_by_one_index",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-25-avg3",
+    "category": "known_diagnostic",
+    "construct": "judge a mean of three",
+    "confound_controlled": "divide by the count",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the average of 4, 8, and 12?\nCandidate A: 12\nCandidate B: 8\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "divided_by_wrong_n",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-26-conv_hr",
+    "category": "known_diagnostic",
+    "construct": "judge a time conversion",
+    "confound_controlled": "seconds per minute",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many seconds are in 4 minutes?\nCandidate A: 240\nCandidate B: 400\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.45,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "magnitude_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-27-syll_some",
+    "category": "known_diagnostic",
+    "construct": "judge an INVALID particular syllogism",
+    "confound_controlled": "some != all",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Some birds are penguins. All penguins are flightless. Does it follow that all birds are flightless?\nCandidate A: Yes\nCandidate B: No\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.75,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "invalid_third_step",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-28-syll_mid",
+    "category": "known_diagnostic",
+    "construct": "judge an undistributed-middle fallacy",
+    "confound_controlled": "shared predicate isn't transitive",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: All dogs are animals. All cats are animals. Does it follow that all dogs are cats?\nCandidate A: No\nCandidate B: Yes\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "undistributed_middle",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-29-buried_offby1",
+    "category": "known_diagnostic",
+    "construct": "judge a multi-step count with a buried off-by-one",
+    "confound_controlled": "the logic is mostly right",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A fence has posts every 2 m along a straight 20 m run, one at each end. How many posts are there?\nCandidate A: 10\nCandidate B: 11\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.75,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "fencepost_off_by_one",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-30-fabricated_among_real",
+    "category": "known_diagnostic",
+    "construct": "judge a list where one value is fabricated",
+    "confound_controlled": "one number is invented",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: The first four prime numbers are listed. Which list is correct?\nCandidate A: 2, 3, 5, 7\nCandidate B: 2, 3, 5, 9\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "fabricated_value_in_real_list",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-31-compound",
+    "category": "known_diagnostic",
+    "construct": "judge compound interest vs simple",
+    "confound_controlled": "compounding step",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: 100 dollars grows at 10% per year, compounded annually, for 2 years. What is the balance?\nCandidate A: 120 dollars\nCandidate B: 121 dollars\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "simple_vs_compound",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-32-rate_inverse",
+    "category": "known_diagnostic",
+    "construct": "judge an inverse-rate trap",
+    "confound_controlled": "time = work / rate",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: If a pump fills a tank in 6 hours, what fraction of the tank is filled in 2 hours?\nCandidate A: 1/3\nCandidate B: 1/2\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "inverted_ratio",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-33-neg_exp",
+    "category": "known_diagnostic",
+    "construct": "judge a negative exponent",
+    "confound_controlled": "reciprocal, not negative",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 2 to the power of -2?\nCandidate A: -4\nCandidate B: 1/4\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "sign_vs_reciprocal",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-34-order_ops",
+    "category": "known_diagnostic",
+    "construct": "judge order of operations",
+    "confound_controlled": "multiply before add",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Evaluate: 2 + 3 * 4.\nCandidate A: 14\nCandidate B: 20\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "left_to_right_error",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-35-prob_and",
+    "category": "known_diagnostic",
+    "construct": "judge an independent-events probability",
+    "confound_controlled": "multiply for AND",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Two fair coins are flipped. What is the probability of two heads?\nCandidate A: 1/2\nCandidate B: 1/4\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "added_vs_multiplied_prob",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-36-units_speed",
+    "category": "known_diagnostic",
+    "construct": "judge a units magnitude slip",
+    "confound_controlled": "km/h vs m/s scale",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A runner moves at 10 m/s. Approximately what is this in km/h?\nCandidate A: 36 km/h\nCandidate B: 3.6 km/h\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "magnitude_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-37-recursion",
+    "category": "known_diagnostic",
+    "construct": "judge a factorial value",
+    "confound_controlled": "trace the recursion",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 4! (4 factorial)?\nCandidate A: 12\nCandidate B: 24\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "dropped_a_factor",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-38-gcd",
+    "category": "known_diagnostic",
+    "construct": "judge a greatest common divisor",
+    "confound_controlled": "largest common factor",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the greatest common divisor of 12 and 18?\nCandidate A: 6\nCandidate B: 3\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "common_but_not_greatest",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-39-slope",
+    "category": "known_diagnostic",
+    "construct": "judge a slope between points",
+    "confound_controlled": "rise over run sign",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the slope of the line through (0, 0) and (2, 6)?\nCandidate A: 1/3\nCandidate B: 3\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "inverted_slope",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-40-dedup",
+    "category": "known_diagnostic",
+    "construct": "judge a distinct-count",
+    "confound_controlled": "unique elements only",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many DISTINCT values are in [1, 2, 2, 3, 3, 3]?\nCandidate A: 3\nCandidate B: 6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "counted_duplicates",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-41-buried_sign",
+    "category": "known_diagnostic",
+    "construct": "judge a longer arithmetic chain with a sign error",
+    "confound_controlled": "mostly-correct chain",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Evaluate: 10 - 3 + 2 - 4.\nCandidate A: 1\nCandidate B: 5\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "buried_sign_error",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-42-ratio_scale",
+    "category": "known_diagnostic",
+    "construct": "judge a recipe scaling",
+    "confound_controlled": "scale every term",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A recipe for 2 servings needs 3 eggs. How many eggs for 6 servings?\nCandidate A: 9\nCandidate B: 6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "added_instead_of_scaled",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-43-leap",
+    "category": "known_diagnostic",
+    "construct": "judge a leap-year rule",
+    "confound_controlled": "century divisibility rule",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Was the year 1900 a leap year?\nCandidate A: Yes\nCandidate B: No\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.75,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "missed_century_rule",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-44-binsum",
+    "category": "known_diagnostic",
+    "construct": "judge a binary-to-decimal value",
+    "confound_controlled": "place value in base 2",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the binary number 1011 in decimal?\nCandidate A: 11\nCandidate B: 13\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "bit_place_error",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-45-setunion",
+    "category": "known_diagnostic",
+    "construct": "judge a set-union size",
+    "confound_controlled": "no double counting",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Set A = {1,2,3}, set B = {3,4,5}. How many elements are in A union B?\nCandidate A: 6\nCandidate B: 5\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "double_counted_overlap",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-46-trailingzero",
+    "category": "known_diagnostic",
+    "construct": "judge a power-of-ten magnitude",
+    "confound_controlled": "count the zeros",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 10 to the power of 4?\nCandidate A: 10000\nCandidate B: 1000\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "off_by_one_zero",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-47-weighted",
+    "category": "known_diagnostic",
+    "construct": "judge a weighted-average trap",
+    "confound_controlled": "weight by counts",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Class A (10 students) averaged 80; class B (40 students) averaged 90. What is the combined average?\nCandidate A: 85\nCandidate B: 88\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.75,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "unweighted_mean",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-48-nested",
+    "category": "known_diagnostic",
+    "construct": "judge a nested list-comp trace",
+    "confound_controlled": "execute both loops",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What does [a+b for a in [1,2] for b in [10,20]] evaluate to?\nCandidate A: [11, 21, 12, 22]\nCandidate B: [11, 22]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.75,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "zipped_instead_of_product",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "pair-49-offby_loop",
+    "category": "known_diagnostic",
+    "construct": "judge a range-bound loop count",
+    "confound_controlled": "range upper bound exclusive",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many times does the body of 'for i in range(1, 5)' run?\nCandidate A: 5\nCandidate B: 4\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "inclusive_range_slip",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "pair-50-decimal_mult",
+    "category": "known_diagnostic",
+    "construct": "judge a decimal multiplication magnitude",
+    "confound_controlled": "place the decimal point",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is 0.3 x 0.2?\nCandidate A: 0.06\nCandidate B: 0.6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "decimal_place_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "code-01-mutated-shared-default",
+    "category": "known_diagnostic",
+    "construct": "judge a mutable-default-argument trace",
+    "confound_controlled": "default object is created once, not per call",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given\n    def acc(x, bucket=[]):\n        bucket.append(x)\n        return bucket\nthe calls acc(1), then acc(2), then acc(3) run in that order. What does the final call acc(3) return?\nCandidate A: [1, 2, 3]\nCandidate B: [3]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "mutated_shared_default",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "code-02-alias-not-copy",
+    "category": "known_diagnostic",
+    "construct": "judge a list-of-lists aliasing trace",
+    "confound_controlled": "inner-list multiplication shares one object across rows",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given\n    grid = [[0] * 3] * 3\n    grid[0][0] = 1\nwhat is the value of grid afterward?\nCandidate A: [[1, 0, 0], [0, 0, 0], [0, 0, 0]]\nCandidate B: [[1, 0, 0], [1, 0, 0], [1, 0, 0]]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "alias_not_copy",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "code-03-floor-div-toward-neg-inf",
+    "category": "known_diagnostic",
+    "construct": "judge a floor-division sign trap",
+    "confound_controlled": "// floors toward negative infinity, not toward zero",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python 3, what does the expression -7 // 2 evaluate to?\nCandidate A: -4\nCandidate B: -3\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.8,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "floor_div_toward_neg_inf",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "code-04-slice-excludes-stop",
+    "category": "known_diagnostic",
+    "construct": "judge a strided-slice bound trap",
+    "confound_controlled": "slice stop index is excluded even with a step",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given xs = [0, 1, 2, 3, 4, 5], what does xs[1:5:2] evaluate to?\nCandidate A: [1, 3]\nCandidate B: [1, 3, 5]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "slice_excludes_stop",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "code-05-short-circuit-skips-call",
+    "category": "known_diagnostic",
+    "construct": "judge a short-circuit side-effect trace",
+    "confound_controlled": "and stops at the first falsy operand, skipping the second call",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given\n    log = []\n    def note(v):\n        log.append(v)\n        return v\n    note(0) and note(9)\nafter that statement runs, what is log?\nCandidate A: [0, 9]\nCandidate B: [0]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.62,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "short_circuit_skips_call",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "code-06-late-binding-closure",
+    "category": "known_diagnostic",
+    "construct": "judge a late-binding closure trace",
+    "confound_controlled": "closures capture the variable, not its per-iteration value",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given\n    fns = [lambda: i for i in range(3)]\n    result = [f() for f in fns]\nwhat is result?\nCandidate A: [2, 2, 2]\nCandidate B: [0, 1, 2]\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.72,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "late_binding_closure",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "code-07-dict-insertion-order",
+    "category": "difficulty_anchor",
+    "construct": "judge a dict insertion-order trace",
+    "confound_controlled": "updating an existing key keeps its position; only new keys append",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Given\n    d = {\"a\": 1, \"b\": 2}\n    d[\"a\"] = 9\n    d[\"c\"] = 3\nwhat is list(d.keys())?\nCandidate A: ['a', 'b', 'c']\nCandidate B: ['b', 'c', 'a']\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "update_keeps_dict_position",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "logic-01-affirm-consequent",
+    "category": "known_diagnostic",
+    "construct": "judge an affirming-the-consequent inference",
+    "confound_controlled": "the consequent can hold for other reasons",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Premise 1: If it rained last night, then the ground is wet this morning. Premise 2: The ground is wet this morning. Does it logically follow that it rained last night?\nCandidate A: Yes, it rained last night.\nCandidate B: No, that does not follow.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "affirming_consequent",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "logic-02-deny-antecedent",
+    "category": "known_diagnostic",
+    "construct": "judge a denying-the-antecedent inference",
+    "confound_controlled": "a false antecedent does not falsify the consequent",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Premise 1: If a whole number is divisible by 4, then it is even. Premise 2: 6 is not divisible by 4. Does it logically follow that 6 is not even?\nCandidate A: No, that does not follow.\nCandidate B: Yes, 6 is not even.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.72,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "denying_antecedent",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "logic-03-converse-not-contrapositive",
+    "category": "known_diagnostic",
+    "construct": "judge which transformation preserves a conditional",
+    "confound_controlled": "contrapositive is equivalent, converse is not",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Consider the statement: 'If a shape is a square, then it has four sides.' Which of the following is logically equivalent to it?\nCandidate A: If a shape has four sides, then it is a square.\nCandidate B: If a shape does not have four sides, then it is not a square.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "converse_not_contrapositive",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "logic-04-quantifier-scope-swap",
+    "category": "known_diagnostic",
+    "construct": "judge a forall-exists scope swap",
+    "confound_controlled": "each student's book may differ",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Suppose it is true that 'every student read some book' (each student read at least one book, not necessarily the same one). Does it logically follow that 'there is some book that every student read'?\nCandidate A: No, that does not follow.\nCandidate B: Yes, there is some book every student read.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.8,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "quantifier_scope_swap",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "logic-05-vacuous-truth",
+    "category": "known_diagnostic",
+    "construct": "judge a vacuously true universal over an empty domain",
+    "confound_controlled": "no counterexample exists when the domain is empty",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A box contains no balls at all. Consider the statement: 'Every ball in the box is red.' Is this statement true?\nCandidate A: No, it is false, because there are no red balls in the box.\nCandidate B: Yes, it is true, because there is no ball in the box that fails to be red.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.77,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "vacuous_truth_misread",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "logic-06-demorgan-negation",
+    "category": "known_diagnostic",
+    "construct": "judge a De Morgan negation of a conjunction",
+    "confound_controlled": "negation of AND distributes to OR",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: It is not the case that the room is both warm and bright. Which statement is logically equivalent to this?\nCandidate A: The room is not warm and the room is not bright.\nCandidate B: The room is not warm or the room is not bright.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "demorgan_negation_slip",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "logic-07-modus-ponens-anchor",
+    "category": "difficulty_anchor",
+    "construct": "judge a textbook modus ponens",
+    "confound_controlled": "valid form, everyday content",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Premise 1: If it is raining, then the streets are wet. Premise 2: It is raining. Does it logically follow that the streets are wet?\nCandidate A: Yes, the streets are wet.\nCandidate B: No, that does not follow.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "valid_modus_ponens_denied",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "unit-01-fahrenheit-offset",
+    "category": "known_diagnostic",
+    "construct": "judge a Celsius-to-Fahrenheit conversion",
+    "confound_controlled": "apply the +32 offset, not just the ratio",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Convert 25 degrees Celsius to degrees Fahrenheit.\nCandidate A: 77\nCandidate B: 45\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "forgot_fahrenheit_offset",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "unit-02-area-square-scale",
+    "category": "known_diagnostic",
+    "construct": "judge an area-scaling factor",
+    "confound_controlled": "area scales as the square of the linear factor",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A square garden has an area of 12 square meters. If every side is made three times as long, what is the new area in square meters?\nCandidate A: 36\nCandidate B: 108\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "area_scales_linearly_error",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "unit-03-volume-cube-scale",
+    "category": "known_diagnostic",
+    "construct": "judge a volume-scaling factor",
+    "confound_controlled": "volume scales as the cube of the linear factor, not the square",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A cube-shaped tank holds 5 liters. If every edge is doubled in length, how many liters does the larger cube hold?\nCandidate A: 40\nCandidate B: 20\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.8,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "volume_scales_squared_error",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "unit-04-speed-factor-slip",
+    "category": "known_diagnostic",
+    "construct": "judge a kilometers-per-hour to meters-per-second conversion",
+    "confound_controlled": "divide by 3.6, not by 3",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A car travels at 36 kilometers per hour. What is its speed in meters per second?\nCandidate A: 12\nCandidate B: 10\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "speed_unit_factor_slip",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "unit-05-si-prefix-power",
+    "category": "known_diagnostic",
+    "construct": "judge a kilometers-to-centimeters conversion",
+    "confound_controlled": "count five prefix steps, not four",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many centimeters are in 2.5 kilometers?\nCandidate A: 250000\nCandidate B: 25000\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.58,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "si_prefix_power_slip",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "unit-06-rate-time-inverted",
+    "category": "known_diagnostic",
+    "construct": "judge a time-from-rate-and-distance computation",
+    "confound_controlled": "divide distance by rate, do not multiply them",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A person walks at a steady 1.2 meters per second. How many seconds does it take them to cover 30 meters?\nCandidate A: 36\nCandidate B: 25\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "rate_time_inverted",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "unit-07-km-to-m-anchor",
+    "category": "difficulty_anchor",
+    "construct": "judge a kilometers-to-meters conversion",
+    "confound_controlled": "one kilometer is one thousand meters",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: How many meters are in 3 kilometers?\nCandidate A: 3000\nCandidate B: 300\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "km_to_m_anchor",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "fact-01-capital-au",
+    "category": "known_diagnostic",
+    "construct": "judge a national capital",
+    "confound_controlled": "capital vs largest city",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the capital of Australia?\nCandidate A: Sydney\nCandidate B: Canberra\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.55,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "plausible_wrong_capital",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "fact-02-author-swap",
+    "category": "known_diagnostic",
+    "construct": "judge a novel's author",
+    "confound_controlled": "same-era same-genre author",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Who wrote the novel Crime and Punishment?\nCandidate A: Fyodor Dostoevsky\nCandidate B: Leo Tolstoy\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "swapped_author_work",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "fact-03-element-w",
+    "category": "known_diagnostic",
+    "construct": "judge an element's chemical symbol",
+    "confound_controlled": "symbol vs English name",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the chemical symbol for tungsten?\nCandidate A: Tu\nCandidate B: W\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.65,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "near_miss_element_symbol",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "fact-04-suez-year",
+    "category": "known_diagnostic",
+    "construct": "judge the year of a historical event",
+    "confound_controlled": "exact year, not decade",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In what year did the Suez Canal open?\nCandidate A: 1869\nCandidate B: 1872\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.7,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "off_by_few_years_event",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "fact-05-atomic-k",
+    "category": "known_diagnostic",
+    "construct": "judge an element's atomic number",
+    "confound_controlled": "off-by-one to the neighbor element",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the atomic number of potassium?\nCandidate A: 20\nCandidate B: 19\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.8,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "near_miss_atomic_number",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "fact-06-chrono-order",
+    "category": "known_diagnostic",
+    "construct": "judge the chronological order of two events",
+    "confound_controlled": "earlier-of-two, order not transposed",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Which happened first: the Peace of Westphalia or the French Revolution?\nCandidate A: The Peace of Westphalia happened first.\nCandidate B: The French Revolution happened first.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "transposed_chronology",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "fact-07-anchor-jp-capital",
+    "category": "difficulty_anchor",
+    "construct": "judge a national capital",
+    "confound_controlled": "capital vs former capital",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: What is the capital of Japan?\nCandidate A: Kyoto\nCandidate B: Tokyo\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "capital_vs_former_capital",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "stat-01-base-rate",
+    "category": "known_diagnostic",
+    "construct": "judge a Bayesian posterior under a low base rate",
+    "confound_controlled": "use the prior, not the test sensitivity",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A disease affects 1% of a population. A test detects it correctly in 90% of people who have it (sensitivity), and gives a false positive in 9% of people who do not have it. A randomly chosen person tests positive. What is the approximate probability they actually have the disease?\nCandidate A: about 9%\nCandidate B: about 90%\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.82,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "base_rate_neglect",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "stat-02-cond-inversion",
+    "category": "known_diagnostic",
+    "construct": "judge a conditional-probability inversion",
+    "confound_controlled": "P(test+ given disease) is not P(disease given test+)",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In a population, 95% of people who have a certain disease test positive for it. A patient tests positive. Does it follow, from this fact alone, that the patient has a 95% chance of having the disease?\nCandidate A: Yes\nCandidate B: No\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.68,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "conditional_probability_inversion",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "stat-03-simpson",
+    "category": "known_diagnostic",
+    "construct": "judge a Simpson's-paradox aggregation reversal",
+    "confound_controlled": "compare within strata, not the pooled rate",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A study compares two treatments. For small kidney stones: Treatment A succeeded in 81 of 87 cases (93%), Treatment B in 234 of 270 (87%). For large kidney stones: Treatment A succeeded in 192 of 263 cases (73%), Treatment B in 55 of 80 (69%). Accounting for stone size, which treatment has the higher success rate?\nCandidate A: Treatment A\nCandidate B: Treatment B\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.85,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "simpson_reversal",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "stat-04-median-vs-mean",
+    "category": "known_diagnostic",
+    "construct": "judge the median of a right-skewed set",
+    "confound_controlled": "sort and pick the middle, do not report the mean",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: Seven employees have annual salaries (in thousands of dollars) of 30, 32, 34, 36, 38, 40, and 300. What is the median salary, in thousands?\nCandidate A: 36\nCandidate B: 72.86\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.6,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "median_vs_mean_skew",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "stat-05-prosecutor",
+    "category": "known_diagnostic",
+    "construct": "judge a prosecutor's-fallacy claim",
+    "confound_controlled": "random-match probability is not the probability of innocence",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A forensic sample matches a defendant. The lab states the probability that a randomly chosen person would match by chance is 1 in a million. The city has 2 million residents. The prosecutor argues the match alone shows the probability the defendant is innocent is just 1 in a million. Is the prosecutor's reasoning sound?\nCandidate A: Yes\nCandidate B: No\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "prosecutor_fallacy",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "stat-06-regression-mean",
+    "category": "known_diagnostic",
+    "construct": "judge a regression-to-the-mean confound",
+    "confound_controlled": "extreme scores drift toward average on their own",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A flight school notices that pilots harshly criticized after an unusually bad landing tend to do better on their next landing, while pilots praised after an unusually good landing tend to do worse. Which conclusion is best supported?\nCandidate A: Both patterns are largely explained by regression to the mean, since extreme performances are naturally followed by ones closer to average.\nCandidate B: The data show that criticism causes pilots to improve and praise causes them to get worse.\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.72,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "regression_to_mean_ignored",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "stat-07-die-prob",
+    "category": "difficulty_anchor",
+    "construct": "judge a single-die probability",
+    "confound_controlled": "count all six equally likely faces",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: A fair six-sided die is rolled once. What is the probability of rolling a 4?\nCandidate A: 1/4\nCandidate B: 1/6\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "wrong_denominator",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "prec-01-mul-over-add",
+    "category": "difficulty_anchor",
+    "construct": "judge multiplication-before-addition",
+    "confound_controlled": "apply * before +, not left-to-right",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression 2 + 3 * 4 evaluate to?\nCandidate A: 14\nCandidate B: 20\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.2,
+    "expected_pass": {
+      "strong": true,
+      "weak": true
+    },
+    "metadata": {
+      "flaw_family": "mult_over_add",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "prec-02-not-binds-tighter",
+    "category": "known_diagnostic",
+    "construct": "judge not-binds-tighter-than-and",
+    "confound_controlled": "bind not before and, not over the whole expression",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression not False and False evaluate to?\nCandidate A: False\nCandidate B: True\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.62,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "bool_not_binds_tighter",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "prec-03-and-over-or",
+    "category": "known_diagnostic",
+    "construct": "judge and-binds-tighter-than-or",
+    "confound_controlled": "evaluate and before or, not left-to-right",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression True or False and False evaluate to?\nCandidate A: False\nCandidate B: True\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.66,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "bool_and_over_or",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "prec-04-exponent-right-assoc",
+    "category": "known_diagnostic",
+    "construct": "judge exponent right-associativity",
+    "confound_controlled": "associate ** right-to-left, not left-to-right",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression 2 ** 3 ** 2 evaluate to?\nCandidate A: 512\nCandidate B: 64\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "A",
+    "difficulty": 0.8,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "exponent_right_assoc",
+      "correct_side": "A"
+    }
+  },
+  {
+    "id": "prec-05-unary-minus-below-power",
+    "category": "known_diagnostic",
+    "construct": "judge unary-minus-below-power",
+    "confound_controlled": "apply ** before the leading unary minus",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression -3 ** 2 evaluate to?\nCandidate A: 9\nCandidate B: -9\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.78,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "unary_minus_below_power",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "prec-06-comparison-below-bitwise",
+    "category": "known_diagnostic",
+    "construct": "judge bitwise-binds-tighter-than-comparison",
+    "confound_controlled": "bind | before ==, not == before |",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression 2 | 1 == 1 evaluate to?\nCandidate A: 3\nCandidate B: False\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.82,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "comparison_below_bitwise",
+      "correct_side": "B"
+    }
+  },
+  {
+    "id": "prec-07-comparison-chaining",
+    "category": "known_diagnostic",
+    "construct": "judge comparison chaining",
+    "confound_controlled": "chain as conjunction, not left-associative re-comparison",
+    "prompt": "You are an impartial judge. For the question below, exactly one of the two candidate answers is correct and the other is subtly wrong. Decide which is correct.\n\nQuestion: In Python, what does the expression 1 < 3 == 3 evaluate to?\nCandidate A: False\nCandidate B: True\n\nWhich candidate is correct? Reply with exactly one letter: A or B.",
+    "gold": "B",
+    "difficulty": 0.76,
+    "expected_pass": {
+      "strong": true,
+      "weak": false
+    },
+    "metadata": {
+      "flaw_family": "comparison_chain_not_left_assoc",
+      "correct_side": "B"
+    }
+  }
+]

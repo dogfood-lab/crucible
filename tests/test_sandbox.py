@@ -3,7 +3,7 @@ topology (research-grounding §10.4; phase-0/swarm-18).
 
 The provider's API is async; these tests drive it with :func:`asyncio.run` so the
 suite needs no pytest-asyncio plugin and no shared config change (exclusive
-ownership: this file and ``src/crucible/sandbox.py`` only).
+ownership: this file and ``src/ai_crucible/sandbox.py`` only).
 
 Real tests — including the failing cases the dogfood discipline requires:
 - a sleeping command actually trips the timeout and reports ``timed_out=True``;
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pytest
 
-from crucible.sandbox import (
+from ai_crucible.sandbox import (
     ExecResult,
     LocalSandbox,
     SandboxEnvironment,

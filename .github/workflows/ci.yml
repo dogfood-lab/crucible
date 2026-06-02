@@ -67,7 +67,7 @@ jobs:
       - name: Test (pytest + coverage gate)
         run: >-
           uv run pytest
-          --cov=crucible
+          --cov=ai_crucible
           --cov-report=term-missing
           --cov-fail-under=${{ steps.covfloor.outputs.floor }}
 

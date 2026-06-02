@@ -1,0 +1,38 @@
+[
+  {
+    "id": "diagnostic-multistep-0001",
+    "category": "known_diagnostic",
+    "construct": "multi-step arithmetic reasoning",
+    "confound_controlled": "lookup/recall (the numbers are novel, not memorizable)",
+    "prompt": "A train travels 60 km in the first hour and 90 km in the second hour. What is its average speed in km/h over the two hours? Answer with the number only.",
+    "gold": "75",
+    "expected_pass": {"weak": false, "strong": true},
+    "difficulty": 0.5,
+    "discrimination": 1.6,
+    "metadata": {"why": "should separate strong vs weak; earns the label only if monotone in pilot data"}
+  },
+  {
+    "id": "diagnostic-logic-0002",
+    "category": "known_diagnostic",
+    "construct": "transitive deductive reasoning",
+    "confound_controlled": "world knowledge (premises are abstract tokens)",
+    "prompt": "All blorks are fneeps. All fneeps are gribs. Is every blork a grib? Answer yes or no.",
+    "gold": "yes",
+    "expected_pass": {"weak": false, "strong": true},
+    "difficulty": 0.2,
+    "discrimination": 1.4,
+    "metadata": {"why": "syllogism; discriminates reasoning from pattern-matching"}
+  },
+  {
+    "id": "diagnostic-codetrace-0003",
+    "category": "known_diagnostic",
+    "construct": "code execution tracing",
+    "confound_controlled": "API recall (pure arithmetic loop, no library knowledge)",
+    "prompt": "x = 0; for i in range(4): x = x + i. What is x after the loop? Answer with the number only.",
+    "gold": "6",
+    "expected_pass": {"weak": false, "medium": true, "strong": true},
+    "difficulty": 0.0,
+    "discrimination": 1.5,
+    "metadata": {"why": "three-tier diagnostic; expect medium and strong to pass, weak to fail"}
+  }
+]

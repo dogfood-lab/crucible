@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for the Crucible kernel tests.
+"""Shared pytest fixtures for the AI Crucible kernel tests.
 
 Coordinator-owned. Build-wave agents may add fixtures inside their own test
 modules; this file holds only the cross-domain fixtures (a valid PuzzleMeta and
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from crucible.types import (
+from ai_crucible.types import (
     AttemptState,
     Budget,
     CatalogTier,

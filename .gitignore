@@ -50,4 +50,8 @@ tmp/
 
 # pip-audit scratch
 requirements-audit.txt
+
+# characterization run outputs
+char-*.json
+characterization-report.json
 site/.astro/

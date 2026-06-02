@@ -5,10 +5,10 @@ sidebar:
   order: 3
 ---
 
-Crucible is a **thin policy layer on [Inspect AI](https://inspect.aisi.org.uk/)** (the UK AI Safety
-Institute's evaluation framework), not a from-scratch harness. Building on Inspect means crucible
+AI Crucible is a **thin policy layer on [Inspect AI](https://inspect.aisi.org.uk/)** (the UK AI Safety
+Institute's evaluation framework), not a from-scratch harness. Building on Inspect means ai-crucible
 inherits a mature, widely-adopted eval substrate and emits traces in a shape peer auditors already
-have tooling for. Crucible's job is the *policy*: the sealed boundary, the conjunctive gate, the
+have tooling for. AI Crucible's job is the *policy*: the sealed boundary, the conjunctive gate, the
 catalog lifecycle, and the role choreography.
 
 The codebase is **predominantly Python**. The only two non-Python dependencies — a signing binary and
@@ -40,7 +40,7 @@ Designer → Solver → (Critic) → Judge. The only function permitted to call 
 attempt's output is the **injected `generate` closure**. Every role is constructed with that same
 closure and routes *all* model calls through it; no role imports or calls a model client directly.
 
-This single choke point is what makes crucible observable and replayable: every model call and every
+This single choke point is what makes ai-crucible observable and replayable: every model call and every
 tool call is recorded — by the kernel, never self-reported by the model — as a structured trace event
 at exactly one place, and it can be exercised with a fake `generate` in tests with no model runtime.
 The same property lets every dependency be injected (`generate`, the grading edge, the judges, the
@@ -71,7 +71,7 @@ explicit.)
 
 ## The cross-family judge panel (external verifier)
 
-No model verifies its own output, and crucible enforces this *structurally*. Same-family
+No model verifies its own output, and ai-crucible enforces this *structurally*. Same-family
 self-preference is mechanistic — a model over-rates its own low-perplexity text — so "use a different
 prompt" is not enough; the judge must come from a different *distribution*. The panel therefore:
 
@@ -114,9 +114,9 @@ the native `pass^k` reliability unit described in **[Core concepts](./concepts/)
 
 ## The polyglot attestation edge
 
-Crucible's results are meant to be trustworthy to a third party, which means provenance that survives
+AI Crucible's results are meant to be trustworthy to a third party, which means provenance that survives
 an adversarial "did you quietly drop unfavorable results?" challenge. The `attestation` module backs
 the trace log with an **append-only, hash-chained event store** and is the seam where
-cryptographic-timestamp and signing tooling integrate. This is the one place crucible reaches outside
+cryptographic-timestamp and signing tooling integrate. This is the one place ai-crucible reaches outside
 Python — and it does so behind a single typed subprocess boundary, so the polyglot edge is contained
 to one module rather than smeared across the codebase.

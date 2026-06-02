@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "seats": [
+    {
+      "model_id": "gemma4:31b",
+      "reliability_weight": 1.0,
+      "family": "gemma",
+      "review_flag": true
+    },
+    {
+      "model_id": "granite4.1:30b",
+      "reliability_weight": 0.9542829675483024,
+      "family": "granite",
+      "review_flag": true
+    }
+  ],
+  "submodular": true,
+  "meets_quorum": false,
+  "escalate": true,
+  "not_seated": [
+    "aya-expanse:32b",
+    "devstral-small-2:24b",
+    "mistral-small:24b",
+    "qwen3.6:27b"
+  ],
+  "dropped_redundant": [],
+  "threshold": 0.25,
+  "min_judges": 3,
+  "notes": [
+    "2 judge(s) seated from 2 admitted; 0 dropped as \u03c1-redundant (\u22650.25); 4 not admitted (screen/reject)",
+    "quorum 2/3: NOT MET \u2192 escalate to the Claude Designer (PoLL \u22653); too few independent judges to trust a panel verdict",
+    "submodularity: PASS (every seated pair |\u03c1| < 0.25)"
+  ]
+}

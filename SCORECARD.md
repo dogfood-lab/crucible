@@ -2,7 +2,7 @@
 
 > Pre/post assessment for the full treatment (2026-06-01).
 
-**Repo:** dogfood-lab/crucible
+**Repo:** dogfood-lab/ai-crucible
 **Date:** 2026-06-01
 **Type tags:** `[all]` `[pypi]` (Python library/framework — not CLI/MCP/desktop/npm)
 

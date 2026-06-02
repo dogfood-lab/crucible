@@ -6,9 +6,9 @@
 
 ---
 
-# Crucible Solver framing: where the task-relevant/irrelevant line falls
+# AI Crucible Solver framing: where the task-relevant/irrelevant line falls
 
-**Bottom line up front:** The evidence does NOT support deleting competitive framing. It supports a sharp reshaping rule — **signals that point the model at task-critical features help; signals that activate identity, demographics, or social capitulation hurt.** Crucible's instinct ("competitive framing enriches the verification surface") is correct *if and only if* the competition is expressed as quantitative task metrics, not as social/identity theater or coercive pressure.
+**Bottom line up front:** The evidence does NOT support deleting competitive framing. It supports a sharp reshaping rule — **signals that point the model at task-critical features help; signals that activate identity, demographics, or social capitulation hurt.** AI Crucible's instinct ("competitive framing enriches the verification surface") is correct *if and only if* the competition is expressed as quantitative task metrics, not as social/identity theater or coercive pressure.
 
 ## Findings
 
@@ -17,7 +17,7 @@
 
 2. **Patel et al. 2026, "The Role of Emotional Stimuli and Intensity in Shaping LLM Behavior" (arXiv:2604.07369)** — https://arxiv.org/abs/2604.07369 — Extends Li 2023 by varying *intensity*; effect is non-monotonic with diminishing/reversing returns at high intensity. → **Design implication:** Cap the pressure. One stakes clause, not a stacked "graduation depends on this + you're losing + last place" pileup.
 
-3. **Luz de Araujo et al. 2025 (EMNLP), "Principled Personas" (arXiv:2508.19764)** — https://aclanthology.org/2025.emnlp-main.1364/ — 9 models × 27 tasks. **Task-relevant/expert personas → positive or neutral; task-irrelevant attributes → drops of nearly 30 points.** Formalizes the exact taxonomy crucible needs. → **Design implication:** "Solver-7 of 12" is fine ONLY as a task label; never attach an identity ("a competitive 28-year-old engineer") — that's the degrading axis.
+3. **Luz de Araujo et al. 2025 (EMNLP), "Principled Personas" (arXiv:2508.19764)** — https://aclanthology.org/2025.emnlp-main.1364/ — 9 models × 27 tasks. **Task-relevant/expert personas → positive or neutral; task-irrelevant attributes → drops of nearly 30 points.** Formalizes the exact taxonomy ai-crucible needs. → **Design implication:** "Solver-7 of 12" is fine ONLY as a task label; never attach an identity ("a competitive 28-year-old engineer") — that's the degrading axis.
 
 4. **Cao et al. 2026, "From Biased Chatbots to Biased Agents" (arXiv:2602.12285)** — https://arxiv.org/abs/2602.12285 — The −26.2% figure is driven specifically by **task-irrelevant demographic** role cues on agentic benchmarks. Confirmed: it does NOT test competitive *performance* signals. → **Design implication:** Rebuts the prior swarm's overreach. Cao bans demographic personas, not standings. Standings survive.
 
@@ -33,7 +33,7 @@
 
 **The line is feature-pointing vs. self-pointing.** A competitive cue helps when it directs attention to *the task's verifiable features* (your tool-call count, your solve-rate on the metric, the elegance record to beat — all quantitative, all about the work). It hurts when it directs attention to *the self* (identity, demographics) or *capitulation* (another agent confidently disputing you). Cao bans the first failure mode; the answer-flipping work bans the second; EmotionPrompt + Reward-Is-Enough explain why the metric form actively helps.
 
-**The form Crucible SHOULD use (not delete):** Keep "Solver-7 of 12" as a bare task label. Express standings as **quantitative, actionable, self-referential metrics**: *"Current best solve: 4 tool calls. Yours so far: 6. Graduation threshold: solve under 5."* This is EmotionPrompt's attention boost + Reflexion's semantic-gradient + Reward-Is-Enough's in-context scalar — all three confirmed-helpful axes stacked. **Strip:** any demographic/personality identity on the Solver, any "rival agent insists the answer is X" pushback dynamic, and any stacked-intensity pressure pileup (cap at one stakes clause). That is the evidence-grounded competitive frame.
+**The form AI Crucible SHOULD use (not delete):** Keep "Solver-7 of 12" as a bare task label. Express standings as **quantitative, actionable, self-referential metrics**: *"Current best solve: 4 tool calls. Yours so far: 6. Graduation threshold: solve under 5."* This is EmotionPrompt's attention boost + Reflexion's semantic-gradient + Reward-Is-Enough's in-context scalar — all three confirmed-helpful axes stacked. **Strip:** any demographic/personality identity on the Solver, any "rival agent insists the answer is X" pushback dynamic, and any stacked-intensity pressure pileup (cap at one stakes clause). That is the evidence-grounded competitive frame.
 
 ---
 

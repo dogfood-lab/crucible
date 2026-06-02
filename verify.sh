@@ -9,12 +9,12 @@ uv run ruff check .
 
 echo "== pytest (+ coverage gate, floor from pyproject) =="
 floor=$(uv run python -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['tool']['coverage']['report']['fail_under'])")
-uv run pytest --cov=crucible --cov-report=term-missing --cov-fail-under="$floor"
+uv run pytest --cov=ai_crucible --cov-report=term-missing --cov-fail-under="$floor"
 
 echo "== build (wheel + sdist) =="
 uv build
 
 echo "== smoke (import + version) =="
-uv run python -c "import crucible; print('crucible', crucible.__version__, 'import OK')"
+uv run python -c "import ai_crucible; print('ai-crucible', ai_crucible.__version__, 'import OK')"
 
 echo "verify: OK"

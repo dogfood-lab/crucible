@@ -1,7 +1,7 @@
 # Ship Gate
 
 > No repo is "done" until every applicable line is checked.
-> Checked/SKIP state for crucible v0.2.0 (full treatment, 2026-06-01).
+> Checked/SKIP state for ai-crucible v0.2.0 (full treatment, 2026-06-01).
 
 **Tags:** `[all]` every repo · `[npm]` `[pypi]` `[vsix]` `[desktop]` `[container]` published artifacts · `[mcp]` MCP servers · `[cli]` CLI tools
 
@@ -20,7 +20,7 @@
 
 - [ ] `[cli|mcp|desktop]` Dangerous actions require explicit `--allow-*` flag — SKIP: library, no CLI/MCP/desktop surface; the kernel exposes no destructive operations.
 - [ ] `[cli|mcp|desktop]` File operations constrained to known directories — SKIP: not a CLI/MCP/desktop. Nonetheless the `sandbox` module confines every `exec`/`read_file`/`write_file` to the workdir and rejects path escapes (`..`, absolute-outside, symlink).
-- [ ] `[mcp]` Network egress off by default — SKIP: not an MCP server. The Solver sandbox runs `network_mode: none`; crucible makes no outbound calls of its own.
+- [ ] `[mcp]` Network egress off by default — SKIP: not an MCP server. The Solver sandbox runs `network_mode: none`; ai-crucible makes no outbound calls of its own.
 - [ ] `[mcp]` Stack traces never exposed — SKIP: not an MCP server. As a library it raises typed, coded exceptions; the caller controls display.
 
 ## B. Error Handling

@@ -1,4 +1,4 @@
-"""Tests for the kernel-side budget governor (crucible.budget).
+"""Tests for the kernel-side budget governor (ai_crucible.budget).
 
 Per LAW 4 and the dogfood-swarm "prove the gate goes RED" discipline: where we
 assert an enforcement invariant, we also prove the failing case actually raises
@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import pytest
 
-from crucible.budget import BudgetExceeded, BudgetGovernor
-from crucible.types import Budget, TerminatedBy
+from ai_crucible.budget import BudgetExceeded, BudgetGovernor
+from ai_crucible.types import Budget, TerminatedBy
 
 
 def _budget(tool: int = 5, time_s: int = 600) -> Budget:
