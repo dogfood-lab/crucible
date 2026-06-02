@@ -42,10 +42,14 @@ import asyncio
 import statistics
 from collections import Counter
 from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING
 
 from crucible.types import AttemptState, Score
 
-__all__ = ["JudgePanel", "reduce_scores", "judge_family"]
+if TYPE_CHECKING:
+    from crucible.characterize.aggregate import SeatedPanel
+
+__all__ = ["JudgePanel", "reduce_scores", "judge_family", "weighted_judge"]
 
 #: Type alias for an injected judge (Phase-2 wires real cross-family models here).
 JudgeFn = Callable[[AttemptState], Awaitable[Score]]
@@ -62,6 +66,38 @@ def judge_family(judge: JudgeFn) -> str | None:
     family.
     """
     return getattr(judge, "family", None)
+
+
+def weighted_judge(judge: JudgeFn, weight: float, *, family: str | None = None) -> JudgeFn:
+    """Wrap a judge so its returned Score carries a ``judge_weight`` (CARE, §11.4).
+
+    The composed panel (:func:`crucible.characterize.aggregate.compose_panel`) assigns
+    each seat a reliability weight; binding it here lets the ``"weighted"`` reducer
+    weight that judge's vote without the judge needing to know its own weight. The model
+    ``family`` is preserved (or overridden via the keyword) so EXTERNAL_VERIFIER
+    generator-family exclusion still fires on the wrapped judge.
+
+    Args:
+        judge: the judge callable to wrap.
+        weight: the reliability weight to stamp into each Score's metadata (≥ 0).
+        family: override the wrapped judge's family tag; defaults to the inner judge's.
+
+    Returns:
+        A judge callable that runs ``judge`` and adds ``judge_weight`` to the Score.
+
+    Raises:
+        ValueError: if ``weight`` is negative.
+    """
+    if weight < 0.0:
+        raise ValueError(f"judge weight must be >= 0, got {weight}")
+
+    async def _weighted(attempt: AttemptState) -> Score:
+        score = await judge(attempt)
+        score.metadata["judge_weight"] = float(weight)
+        return score
+
+    _weighted.family = family if family is not None else judge_family(judge)  # type: ignore[attr-defined]
+    return _weighted
 
 
 def _aggregate_novelty(scores: list[Score]) -> dict[str, object]:
@@ -154,7 +190,30 @@ def reduce_scores(scores: list[Score], method: str) -> Score:
         base_meta["median"] = med
         return Score(value=med, metadata=base_meta)
 
-    raise ValueError(f"unknown reducer method: {method!r} (use 'majority' or 'median')")
+    if method == "weighted":
+        # Reliability-weighted vote (CARE, §11.4): each judge's vote is weighted by the
+        # ``judge_weight`` it carries in its Score.metadata (a seat's reliability weight,
+        # bound by :func:`weighted_judge`; default 1.0 = equal vote). The weighted
+        # analogue of "majority" — for DISCRETE verdicts (numeric scores use "median").
+        # Surfaces ``escalate``: a too-divided panel routes to the Claude Designer (the
+        # §11.1 Trust-or-Escalate path) rather than committing to a thin weighted winner.
+        from crucible.characterize.aggregate import reliability_weighted_vote
+
+        weights = [float(s.metadata.get("judge_weight", 1.0)) for s in scores]
+        try:
+            result = reliability_weighted_vote(list(zip(values, weights, strict=True)))
+        except ValueError as exc:
+            raise ValueError(f"weighted reducer: {exc}") from exc
+        base_meta["weights"] = weights
+        base_meta["weighted_tally"] = result.weighted_tally
+        base_meta["total_weight"] = result.total_weight
+        base_meta["margin"] = result.margin
+        base_meta["escalate"] = result.escalate
+        return Score(value=result.value, metadata=base_meta)
+
+    raise ValueError(
+        f"unknown reducer method: {method!r} (use 'majority', 'median', or 'weighted')"
+    )
 
 
 class JudgePanel:
@@ -186,6 +245,44 @@ class JudgePanel:
         self.judges = judges
         self.reducer = reducer
         self.generator_family = generator_family
+
+    @classmethod
+    def from_seated(
+        cls,
+        panel: SeatedPanel,
+        judge_for: Callable[[str], JudgeFn],
+        *,
+        generator_family: str | None = None,
+    ) -> JudgePanel:
+        """Build a reliability-weighted panel from a composed :class:`SeatedPanel`.
+
+        The bridge from characterization to scoring: each seated judge is instantiated
+        via ``judge_for`` (the kernel injects this — e.g.
+        ``lambda mid: OllamaModel(mid, fam).as_judge()`` — so this module stays decoupled
+        from the model adapters, DECOMPOSE_BY_SECRETS) and bound to its seat's reliability
+        weight + family (:func:`weighted_judge`). The reducer is ``"weighted"`` (CARE,
+        §11.4); same-family-as-generator judges are still excluded at score time.
+
+        Note the composition already enforced the ρ-submodularity gate and the PoLL ≥3
+        quorum (:func:`crucible.characterize.aggregate.compose_panel`); a sub-quorum
+        ``panel.escalate`` panel should be routed to the Designer by the caller rather
+        than seated here.
+
+        Args:
+            panel: the composed :class:`SeatedPanel` (its ``seats`` are instantiated).
+            judge_for: maps a seated ``model_id`` to a concrete judge callable.
+            generator_family: the attempt's generator family (excluded judges, §10.2).
+
+        Returns:
+            A :class:`JudgePanel` with the seated judges, ``"weighted"`` reducer.
+        """
+        judges = [
+            weighted_judge(
+                judge_for(seat.model_id), seat.reliability_weight, family=seat.family
+            )
+            for seat in panel.seats
+        ]
+        return cls(judges=judges, reducer="weighted", generator_family=generator_family)
 
     def eligible_judges(self) -> list[JudgeFn]:
         """The judges that will actually vote — generator-family judges removed.

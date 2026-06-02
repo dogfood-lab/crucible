@@ -18,7 +18,12 @@ implements against them and never redefines them.
 
 from __future__ import annotations
 
-from crucible.scoring.judge_panel import JudgePanel, judge_family, reduce_scores
+from crucible.scoring.judge_panel import (
+    JudgePanel,
+    judge_family,
+    reduce_scores,
+    weighted_judge,
+)
 from crucible.scoring.oracle import CRITICAL_FLAVOR, OracleOutcome, grade
 from crucible.scoring.stats import (
     clopper_pearson,
@@ -43,4 +48,5 @@ __all__ = [
     "JudgePanel",
     "reduce_scores",
     "judge_family",
+    "weighted_judge",
 ]
