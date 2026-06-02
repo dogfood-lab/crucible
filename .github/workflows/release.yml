@@ -1,0 +1,190 @@
+name: Release
+
+# On a published GitHub Release this:
+#   1. publishes the Python package to PyPI via Trusted Publishing (OIDC, no token),
+#   2. builds PyInstaller binaries for each platform + uploads them (+ checksums) to the release,
+#   3. publishes the @dogfood-lab/ai-crucible npm wrapper (the npm-launcher) via Trusted Publishing.
+#
+# Org rules (.claude/rules/github-actions.md): publish workflows fire on `release: published` only.
+# The repo has ci.yml + this release.yml (the org CI/publish pair) plus pages.yml — pages.yml is the
+# accepted GitHub-Pages-deploy exception (paths-gated to site/**), and the cross-OS binary matrix is
+# the explicit-request exception to the "1 OS / no macos" rule, because the npm launcher distributes
+# platform binaries.
+#
+# First-publish prerequisites (one-time, on the registries):
+#   * PyPI: a pending publisher for project `ai-crucible`, workflow `release.yml` — ALREADY SET
+#     (repository dogfood-lab/ai-crucible, environment "(Any)").
+#   * npm: a v0.0.0 placeholder publish of @dogfood-lab/ai-crucible (reserves the name) + a Trusted
+#     Publisher on npmjs.com (workflow release.yml, org dogfood-lab, repo ai-crucible).
+#   * Do NOT enable "require 2FA / disallow tokens" on the npm package until after the first CI publish.
+#
+# NOTE: the PyInstaller step bundles inspect-ai + the scientific stack; the first CI run may need a
+# hidden-import/collect tweak (a known PyInstaller reality). A failure there is contained — the PyPI
+# job is independent and still publishes; re-dispatch fixes binaries + the npm wrapper.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # never cancel an in-flight publish
+
+jobs:
+  pypi:
+    name: Publish to PyPI (Trusted Publishing)
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC handshake for PyPI Trusted Publishing — the only auth needed
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify the tag matches pyproject version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(grep -m1 '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "tag=${TAG} pyproject=${PKG}"
+          if [ "${TAG}" != "${PKG}" ]; then
+            echo "::error::release tag ${TAG} does not match pyproject version ${PKG}"
+            exit 1
+          fi
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Build sdist + wheel
+        run: uv build
+
+      - name: Check distribution metadata
+        run: uvx twine check dist/*
+
+      - name: Publish to PyPI
+        # Trusted Publishing: no token. PEP 740 attestations are on by default (action >= v1.11.0).
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  build-binaries:
+    name: Build PyInstaller binary (${{ matrix.target }})
+    strategy:
+      fail-fast: false # one OS's failure must not cancel the others
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+            ext: ""
+          - os: macos-latest
+            target: darwin-arm64
+            ext: ""
+          # darwin-x64 omitted: macos-13 is deprecated; the arm64 binary runs via Rosetta.
+          - os: windows-latest
+            target: win-x64
+            ext: ".exe"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv python install 3.12
+      - run: uv venv
+
+      - name: Install ai-crucible + PyInstaller
+        # The [stats] extra pulls statsmodels (the κ machinery the characterize path uses); the
+        # core deps (inspect-ai, numpy, scipy, pydantic) come with the project install.
+        run: uv pip install ".[stats]" "pyinstaller>=6.9.0"
+
+      - name: Build binary
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          uv run pyinstaller --onefile --name ai-crucible --console \
+            --collect-submodules ai_crucible \
+            --collect-all inspect_ai \
+            --collect-submodules pydantic \
+            --collect-submodules scipy \
+            --collect-submodules statsmodels \
+            --collect-submodules numpy \
+            --copy-metadata ai-crucible \
+            src/ai_crucible/__main__.py
+          OUTNAME="ai-crucible-${VERSION}-${{ matrix.target }}${{ matrix.ext }}"
+          mv "dist/ai-crucible${{ matrix.ext }}" "dist/${OUTNAME}"
+          echo "ASSET_NAME=${OUTNAME}" >> "$GITHUB_ENV"
+
+      - name: Smoke-test the binary
+        shell: bash
+        run: dist/${{ env.ASSET_NAME }} --version
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: dist/${{ env.ASSET_NAME }}
+
+  release-binaries:
+    name: Upload binaries + checksums to the release
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # upload assets to the release
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Generate checksums
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          cd artifacts
+          sha256sum * > "checksums-${VERSION}.txt"
+          cat "checksums-${VERSION}.txt"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+
+  npm:
+    name: Publish npm wrapper (Trusted Publishing)
+    needs: release-binaries # the wrapper is only useful once the binaries are on the release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # npm provenance via Sigstore OIDC
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify the npm wrapper version matches the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./npm/package.json').version")
+          echo "tag=${TAG} npm=${PKG}"
+          if [ "${TAG}" != "${PKG}" ]; then
+            echo "::error::release tag ${TAG} does not match npm/package.json version ${PKG}"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install npm >= 11.5 for OIDC trusted-publishing auth
+        run: |
+          # Node 22's bundled npm 10.9 races on an in-place `npm install -g npm@latest`
+          # (MODULE_NOT_FOUND: promise-retry). Install npm@latest into a sandbox and shadow it.
+          SANDBOX="$HOME/.npm-cli-sandbox"
+          mkdir -p "$SANDBOX"
+          pushd "$SANDBOX" >/dev/null
+          echo '{"name":"npm-cli-sandbox","version":"0.0.0","private":true}' > package.json
+          npm install --no-save --no-audit --no-fund --silent npm@latest
+          popd >/dev/null
+          echo "$SANDBOX/node_modules/.bin" >> "$GITHUB_PATH"
+          "$SANDBOX/node_modules/.bin/npm" --version
+
+      - name: Publish wrapper with provenance (OIDC trusted publisher)
+        working-directory: npm
+        run: |
+          npm install --no-save --no-audit --no-fund
+          npm publish --provenance --access public
