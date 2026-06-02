@@ -28,7 +28,9 @@ import pytest
 
 from crucible.characterize.aggregate import (
     SUBMODULARITY_THRESHOLD,
+    SeatedPanel,
     VerdictLike,
+    compose_panel,
     minority_veto,
     pairwise_error_correlation,
     passes_submodularity,
@@ -946,3 +948,133 @@ def test_profile_is_deterministic() -> None:
     assert p1.kappa_z == p2.kappa_z
     assert p1.reliability_weight == p2.reliability_weight
     assert not math.isnan(p1.kappa_z)
+
+
+# --------------------------------------------------------------------------- #
+# §11.4 — panel synthesis: profiles → the seated panel crucible scores with
+# --------------------------------------------------------------------------- #
+
+
+def _seated_profile(
+    model_id: str,
+    weight: float,
+    *,
+    review: bool = False,
+    decision: SeatDecision = SeatDecision.SEAT,
+) -> JudgeProfile:
+    """A minimal profile with just the fields compose_panel reads."""
+    return JudgeProfile(
+        model_id=model_id,
+        role=RoleSlot.JUDGE,
+        n_items=30,
+        reliability_weight=weight,
+        seat_decision=decision,
+        metadata={"review_flag": review},
+    )
+
+
+def test_compose_panel_seats_independent_judges() -> None:
+    """Three SEAT judges with independent errors → all seated (reliability order),
+    quorum met, submodular, no escalation (§11.4)."""
+    profiles = {
+        "a": _seated_profile("a", 1.0),
+        "b": _seated_profile("b", 0.9),
+        "c": _seated_profile("c", 0.8),
+    }
+    records = {
+        "a": _judge_with_errors({0, 5, 10, 15, 20, 25}),
+        "b": _judge_with_errors({2, 7, 12, 17, 22, 27}),
+        "c": _judge_with_errors({3, 8, 13, 18, 23, 28}),
+    }
+    panel = compose_panel(profiles, records)
+    assert isinstance(panel, SeatedPanel)
+    assert [s.model_id for s in panel.seats] == ["a", "b", "c"]  # highest reliability first
+    assert panel.meets_quorum and not panel.escalate and panel.submodular
+    assert panel.dropped_redundant == []
+    assert panel.not_seated == []
+    assert panel.weights == {"a": 1.0, "b": 0.9, "c": 0.8}
+
+
+def test_compose_panel_drops_redundant_and_escalates_below_quorum() -> None:
+    """A ρ-redundant clone is dropped (the higher-reliability twin kept); the surviving
+    pair is below quorum → the panel escalates rather than seating thin (§11.4)."""
+    profiles = {
+        "a": _seated_profile("a", 1.0),
+        "b": _seated_profile("b", 0.5),
+        "c": _seated_profile("c", 0.9),
+    }
+    records = {
+        "a": _judge_with_errors({1, 2, 3, 4}),
+        "b": _judge_with_errors({1, 2, 3, 4}),  # identical errors → ρ=1.0 with a
+        "c": _judge_with_errors(set()),  # perfect → zero-variance → ρ=0 with everyone
+    }
+    panel = compose_panel(profiles, records)
+    # reliability order a(1.0), c(0.9), b(0.5): seat a; seat c (ρ=0); drop b (ρ=1.0 with a)
+    assert [s.model_id for s in panel.seats] == ["a", "c"]
+    assert panel.dropped_redundant == [{"dropped": "b", "kept": "a", "rho": 1.0}]
+    assert not panel.meets_quorum and panel.escalate
+    assert panel.submodular  # the surviving {a, c} pair is ρ=0
+    assert any("escalate" in n for n in panel.notes)
+
+
+def test_compose_panel_excludes_screened_and_rejected() -> None:
+    """SCREEN/REJECT judges never seat; they are reported in ``not_seated`` (sorted)."""
+    profiles = {
+        "a": _seated_profile("a", 1.0),
+        "b": _seated_profile("b", 0.9),
+        "c": _seated_profile("c", 0.8),
+        "screened": _seated_profile("screened", 0.3, decision=SeatDecision.SCREEN),
+        "rejected": _seated_profile("rejected", 0.0, decision=SeatDecision.REJECT),
+    }
+    records = {
+        "a": _judge_with_errors({0, 5, 10, 15}),
+        "b": _judge_with_errors({2, 7, 12, 17}),
+        "c": _judge_with_errors({3, 8, 13, 18}),
+        "screened": _judge_with_errors({1, 6, 11, 16}),
+        "rejected": _judge_with_errors({4, 9, 14, 19}),
+    }
+    panel = compose_panel(profiles, records)
+    seated_ids = [s.model_id for s in panel.seats]
+    assert seated_ids == ["a", "b", "c"]
+    assert panel.not_seated == ["rejected", "screened"]
+    assert panel.meets_quorum and not panel.escalate
+
+
+def test_compose_panel_carries_family_and_review_flag() -> None:
+    """The seat carries the model family (from records) + the Tier-1B review flag (§12)."""
+    gold = _gold(5)
+    profiles = {
+        "a": _seated_profile("a", 1.0, review=True),
+        "b": _seated_profile("b", 0.9),
+        "c": _seated_profile("c", 0.8),
+    }
+    records = {
+        "a": [
+            JudgmentRecord(item_id=f"i{i}", model_id="a", predicted=g, gold=g, family="qwen")
+            for i, g in enumerate(gold)
+        ],
+        "b": _judge_with_errors({2, 7}),
+        "c": _judge_with_errors({3, 8}),
+    }
+    panel = compose_panel(profiles, records)
+    a_seat = next(s for s in panel.seats if s.model_id == "a")
+    assert a_seat.family == "qwen"
+    assert a_seat.review_flag is True
+
+
+def test_compose_panel_no_seated_escalates() -> None:
+    """No SEAT candidate → empty panel, escalate, submodularity vacuously true."""
+    profiles = {"x": _seated_profile("x", 0.0, decision=SeatDecision.REJECT)}
+    records = {"x": _judge_with_errors({1})}
+    panel = compose_panel(profiles, records)
+    assert panel.seats == []
+    assert panel.not_seated == ["x"]
+    assert not panel.meets_quorum and panel.escalate
+    assert panel.submodular is True
+
+
+def test_compose_panel_validates_params() -> None:
+    with pytest.raises(ValueError, match="threshold must be in"):
+        compose_panel({}, {}, threshold=0.0)
+    with pytest.raises(ValueError, match="min_judges must be >= 1"):
+        compose_panel({}, {}, min_judges=0)

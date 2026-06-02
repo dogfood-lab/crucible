@@ -42,21 +42,27 @@ from __future__ import annotations
 
 from collections import Counter
 from collections.abc import Hashable, Sequence
+from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
 
 import numpy as np
 from scipy.stats import pearsonr
 
-from crucible.characterize.types import JudgmentRecord
+from crucible.characterize.types import JudgeProfile, JudgmentRecord, SeatDecision
 
 __all__ = [
     "SUBMODULARITY_THRESHOLD",
     "VerdictLike",
     "pairwise_error_correlation",
     "passes_submodularity",
+    "redundant_pairs",
     "reliability_weighted_vote",
     "VoteResult",
     "minority_veto",
+    "verdict_histogram",
+    "SeatedJudge",
+    "SeatedPanel",
+    "compose_panel",
 ]
 
 #: The §11.4 panel error-correlation ceiling (Codex-Verify submodularity gate). Two
@@ -396,3 +402,204 @@ def verdict_histogram(verdicts: Sequence[VerdictLike | object]) -> dict[object, 
             raise ValueError(f"verdict value must be hashable, got {value!r}")
         counts[value] += 1
     return dict(counts)
+
+
+# --------------------------------------------------------------------------- #
+# Panel synthesis — profiles → the seated panel crucible actually scores with
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(slots=True)
+class SeatedJudge:
+    """One member of the composed panel — a seated, non-redundant judge.
+
+    ``reliability_weight`` is the weight :func:`reliability_weighted_vote` consumes;
+    ``family`` (read from the judge's records) is what
+    :class:`~crucible.scoring.judge_panel.JudgePanel` uses to drop a same-family-as-the-
+    generator judge at scoring time (EXTERNAL_VERIFIER, §10.2); ``review_flag`` carries
+    the profile's super-consistent Tier-1B flag forward so a human reviewing the panel
+    sees which seats were flagged (§12).
+    """
+
+    model_id: str
+    reliability_weight: float
+    family: str | None = None
+    review_flag: bool = False
+
+
+@dataclass(slots=True)
+class SeatedPanel:
+    """The composed panel — :func:`compose_panel`'s output (§11.4).
+
+    Attributes:
+        seats: the final seated judges, highest reliability first, with no pair above
+            the ρ gate (a non-redundant set by construction).
+        submodular: ``True`` iff the seated set passes the ρ gate (it always does — the
+            forward selection guarantees it — but recomputed and reported as a receipt).
+        meets_quorum: ``len(seats) >= min_judges`` (PoLL ≥3, §11.4).
+        escalate: ``True`` when quorum is NOT met — there are too few independent judges
+            to trust a panel verdict, so scoring escalates to the Claude Designer / gold
+            check (the §11.1 Trust-or-Escalate path) rather than seating a thin panel.
+        not_seated: model ids that did not seat at profile time (screen/reject), sorted.
+        dropped_redundant: ``[{"dropped", "kept", "rho"}]`` — judges dropped by the ρ
+            gate, each with the higher-reliability judge it was redundant with and the
+            correlation, so the prune is legible.
+        threshold / min_judges: the gate parameters used (PIN_PER_STEP provenance).
+        notes: contrastive, human-readable record of what the composition did.
+    """
+
+    seats: list[SeatedJudge]
+    submodular: bool
+    meets_quorum: bool
+    escalate: bool
+    not_seated: list[str]
+    dropped_redundant: list[dict[str, object]]
+    threshold: float
+    min_judges: int
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def weights(self) -> dict[str, float]:
+        """``{model_id: reliability_weight}`` for the seated judges (vote-ready)."""
+        return {s.model_id: s.reliability_weight for s in self.seats}
+
+
+def _family_of(records: list[JudgmentRecord] | None) -> str | None:
+    """Read a judge's model family off its records (all records share one family)."""
+    return records[0].family if records else None
+
+
+def compose_panel(
+    profiles: dict[str, JudgeProfile],
+    records: dict[str, list[JudgmentRecord]],
+    *,
+    threshold: float = SUBMODULARITY_THRESHOLD,
+    min_judges: int = 3,
+) -> SeatedPanel:
+    """Compose the seated panel from per-model profiles + records (§11.4).
+
+    The synthesis step that turns characterization output into the instrument config the
+    rest of crucible scores with. Three filters, in order:
+
+    1. **Seat filter** — keep only judges whose profile decision is
+       :attr:`~crucible.characterize.types.SeatDecision.SEAT` (SCREEN/REJECT never seat;
+       a SCREEN judge's verdict always escalates, §11.1).
+    2. **ρ-submodular selection** — greedy forward selection in descending reliability:
+       a judge is seated only if its per-item **error** correlation with every
+       already-seated judge is below ``threshold`` (§11.4 — two judges whose mistakes
+       correlate are "really one judge"; a clone panel fakes independent confirmation).
+       Preferring higher reliability means the kept member of any redundant pair is the
+       better judge; the dropped one is recorded with its conflict + ρ.
+    3. **Quorum** — require ``>= min_judges`` independent seats (PoLL ≥3, §11.4). Below
+       quorum the panel **escalates** to the Claude Designer rather than seating a thin,
+       over-trusted panel (UNCERTAINTY_GATED_HUMANS — the gate is uncertainty, not count).
+
+    Pure + deterministic (PIN_PER_STEP): same profiles + records + parameters → the same
+    panel, byte-for-byte. The reliability ordering breaks ties by ``model_id`` so the
+    result never depends on dict insertion order.
+
+    Standards (the six): **EXTERNAL_VERIFIER — 3** (the ρ gate structurally refuses a
+    redundant judge); **ANDON_AUTHORITY — 3** (sub-quorum → escalate, a thin panel never
+    silently ships a verdict); **PIN_PER_STEP — 3** (pure; ``threshold``/``min_judges``
+    recorded on the result); NAMED_COMPENSATORS **n/a** (pure, no irreversible call).
+
+    Args:
+        profiles: ``{model_id: JudgeProfile}`` (from ``build_profile``).
+        records: ``{model_id: [JudgmentRecord, ...]}`` over the shared calibration set
+            (the same records the profiles were built from — for the ρ correlation +
+            the family tag).
+        threshold: the ρ error-correlation ceiling (default
+            :data:`SUBMODULARITY_THRESHOLD`); must be in ``(0, 1]``.
+        min_judges: the quorum floor (default 3, PoLL).
+
+    Returns:
+        A :class:`SeatedPanel`.
+
+    Raises:
+        ValueError: if ``threshold`` is not in ``(0, 1]`` or ``min_judges`` < 1.
+    """
+    if not 0.0 < threshold <= 1.0:
+        raise ValueError(f"threshold must be in (0, 1], got {threshold}")
+    if min_judges < 1:
+        raise ValueError(f"min_judges must be >= 1, got {min_judges}")
+
+    not_seated = sorted(
+        m for m, p in profiles.items() if p.seat_decision != SeatDecision.SEAT
+    )
+    # Seated candidates, highest reliability first; ties broken by id (determinism).
+    candidates = sorted(
+        (m for m, p in profiles.items() if p.seat_decision == SeatDecision.SEAT),
+        key=lambda m: (-(profiles[m].reliability_weight or 0.0), m),
+    )
+
+    # Pairwise ρ over the candidates' shared records (needs ≥2 with records).
+    cand_records = {m: records[m] for m in candidates if m in records}
+    corr = (
+        pairwise_error_correlation(cand_records) if len(cand_records) >= 2 else {}
+    )
+
+    def _rho(a: str, b: str) -> float:
+        return corr.get((a, b) if a < b else (b, a), 0.0)
+
+    # Greedy forward selection: seat a candidate iff it is < threshold with all seated.
+    selected: list[str] = []
+    dropped_redundant: list[dict[str, object]] = []
+    for m in candidates:
+        conflict = next((s for s in selected if abs(_rho(m, s)) >= threshold), None)
+        if conflict is None:
+            selected.append(m)
+        else:
+            dropped_redundant.append(
+                {"dropped": m, "kept": conflict, "rho": round(_rho(m, conflict), 4)}
+            )
+
+    seats = [
+        SeatedJudge(
+            model_id=m,
+            reliability_weight=profiles[m].reliability_weight or 0.0,
+            family=_family_of(records.get(m)),
+            review_flag=bool(profiles[m].metadata.get("review_flag")),
+        )
+        for m in selected
+    ]
+
+    final_corr = (
+        pairwise_error_correlation({m: records[m] for m in selected if m in records})
+        if len(selected) >= 2
+        else {}
+    )
+    submodular = passes_submodularity(final_corr, threshold)
+    meets_quorum = len(seats) >= min_judges
+    escalate = not meets_quorum
+
+    notes = [
+        f"{len(seats)} judge(s) seated from {len(candidates)} admitted; "
+        f"{len(dropped_redundant)} dropped as ρ-redundant (≥{threshold}); "
+        f"{len(not_seated)} not admitted (screen/reject)",
+        f"quorum {len(seats)}/{min_judges}: "
+        + (
+            "MET — panel may render reliability-weighted verdicts"
+            if meets_quorum
+            else "NOT MET → escalate to the Claude Designer (PoLL ≥3); "
+            "too few independent judges to trust a panel verdict"
+        ),
+        f"submodularity: {'PASS' if submodular else 'FAIL'} "
+        f"(every seated pair |ρ| < {threshold})",
+    ]
+    for d in dropped_redundant:
+        notes.append(
+            f"dropped {d['dropped']} — error-correlated ρ={d['rho']} with seated "
+            f"{d['kept']} (kept the higher-reliability judge)"
+        )
+
+    return SeatedPanel(
+        seats=seats,
+        submodular=submodular,
+        meets_quorum=meets_quorum,
+        escalate=escalate,
+        not_seated=not_seated,
+        dropped_redundant=dropped_redundant,
+        threshold=threshold,
+        min_judges=min_judges,
+        notes=notes,
+    )

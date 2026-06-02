@@ -9,11 +9,12 @@ from crucible.characterize.run import (
     _to_num,
     irt_prune_report,
     known_groups_report,
+    panel_composition_report,
     panel_correlation_report,
     parse_choice,
     parse_verdict,
 )
-from crucible.characterize.types import JudgmentRecord
+from crucible.characterize.types import JudgeProfile, JudgmentRecord, RoleSlot, SeatDecision
 
 
 def _rec(item_id: str, model_id: str, *, correct: bool, gold: int = 1) -> JudgmentRecord:
@@ -154,3 +155,23 @@ def test_jury_needs_two_peers() -> None:
     assert jury is not None
     assert jury["judge"] is recs_a
     assert set(jury) == {"judge", "b", "c"}
+
+
+def test_panel_composition_report_wiring() -> None:
+    # Glue: profiles + records → asdict(SeatedPanel) in the report (seats as plain dicts).
+    def _prof(m: str, w: float, dec: SeatDecision = SeatDecision.SEAT) -> JudgeProfile:
+        return JudgeProfile(
+            model_id=m, role=RoleSlot.JUDGE, n_items=4,
+            reliability_weight=w, seat_decision=dec, metadata={},
+        )
+
+    profiles = {
+        "a": _prof("a", 1.0), "b": _prof("b", 0.9), "c": _prof("c", 0.8),
+        "z": _prof("z", 0.0, SeatDecision.REJECT),
+    }
+    records = {m: [_rec(f"i{j}", m, correct=True) for j in range(4)] for m in profiles}
+    rep = panel_composition_report(profiles, records)
+    assert "error" not in rep
+    assert [s["model_id"] for s in rep["seats"]] == ["a", "b", "c"]
+    assert rep["meets_quorum"] is True and rep["escalate"] is False
+    assert rep["not_seated"] == ["z"]

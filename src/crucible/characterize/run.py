@@ -325,6 +325,21 @@ def perturbation_report(records: dict[str, list[JudgmentRecord]]) -> dict[str, A
     }
 
 
+def panel_composition_report(
+    profiles: dict[str, JudgeProfile], records: dict[str, list[JudgmentRecord]]
+) -> dict[str, Any]:
+    """The composed seated panel — §11.4 (the instrument config the run produces).
+
+    Turns the per-model profiles into the final ρ-pruned, reliability-weighted,
+    quorum-checked panel crucible would score with (:func:`aggregate.compose_panel`).
+    Below quorum the panel escalates to the Claude Designer rather than seating thin.
+    """
+    try:
+        return asdict(aggregate.compose_panel(profiles, records))
+    except Exception as exc:  # noqa: BLE001
+        return {"error": repr(exc)}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Crucible judge-admission characterization run.")
     ap.add_argument("--items", type=Path, default=None, help="items file/dir (default: pairs set)")
@@ -349,10 +364,16 @@ def main(argv: list[str] | None = None) -> int:
         "panel_correlation": panel_correlation_report(records),
         "irt_prune": irt_prune_report(records),
         "perturbation": perturbation_report(records),
+        "panel_composition": panel_composition_report(profiles, records),
     }
     args.out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     seated = [m for m, p in profiles.items() if p.seat_decision.value == "seat"]
     print(f"\nseated: {seated}")
+    comp = report["panel_composition"]
+    if "error" not in comp:
+        panel = [(s["model_id"], round(s["reliability_weight"], 3)) for s in comp["seats"]]
+        verdict = "escalate (sub-quorum)" if comp["escalate"] else "quorum met"
+        print(f"composed panel ({verdict}): {panel}")
     print(f"report -> {args.out}")
     return 0
 

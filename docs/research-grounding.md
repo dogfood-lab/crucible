@@ -728,6 +728,16 @@ The redesign is built and run. Panel: 6 cross-family local models × the 51-item
 - **known-groups is no longer vacuous.** It now catches real trivial-anchor misses — mistral (`pair-03-mult`, `pair-05-div`) and devstral (`pair-02-rev`); the seated trio has zero. This is a *model* signal, not an instrument fault.
 - **Perturbation audit:** every seat decision is robust to ±1 SE threshold jitter (flip_rate 0.0); max 0.0625 (one reject, mistral, flips once near a threshold) — the andon signal is green.
 
+**Composed panel (`aggregate.compose_panel`, the instrument config the run emits).** Synthesis turns the profiles into the seated panel crucible scores with — seat-filter → ρ-submodular greedy selection (highest reliability first) → PoLL ≥3 quorum, escalating to the Claude Designer below quorum. On this run the three seated judges are mutually ρ-independent (every seated pair |ρ| < 0.25 — qwen/gemma are error-free so their error vectors are zero-variance; granite's only high-ρ pairs are with *rejected* models), so all three seat and quorum is met 3/3:
+
+| seat | reliability weight | family | review flag |
+|---|---|---|---|
+| qwen3.6:27b | 1.00 | qwen | ✓ (Tier-1B) |
+| gemma4:31b | 1.00 | gemma | ✓ (Tier-1B) |
+| granite4.1:30b | 0.978 | granite | ✓ (Tier-1B) |
+
+`submodular: true`, `meets_quorum: true`, `escalate: false`, `dropped_redundant: []`. The panel is cross-family (qwen / gemma / granite — EXTERNAL_VERIFIER) and reliability-weighted (CARE). The three review flags are the standing reminder that the seats are super-consistent Tier-1B judges whose ω is still a circular bootstrap — the panel is *usable* but its trust is provisional until the human alt-test runs.
+
 **Honest findings (carry forward, §11.7 director decisions):**
 
 - **alt-test ω is the circular model-jury bootstrap** (documented in the report's `alt_test_caveat`). The seated trio's high ω (0.80–1.00) partly reflects agreement with the panel majority they dominate, **not** human-validated substitution. Human labels (≥3 annotators, ≥30 items) remain required before ω gates for real.
