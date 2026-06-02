@@ -77,13 +77,18 @@ them is cross-family).
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
+from dataclasses import replace
 
 import numpy as np
+from scipy.optimize import minimize_scalar
 from scipy.stats import norm, pearsonr
 from statsmodels.stats.inter_rater import cohens_kappa
 
 from crucible.characterize.types import JudgmentRecord
+
+_TEMP_EPS = 1e-6  # clamp confidences off {0, 1} so the logit is finite
 
 __all__ = [
     "objective_accuracy",
@@ -559,6 +564,128 @@ def expected_calibration_error(
         gap = abs(correct[mask].mean() - confidence[mask].mean())
         ece += (count / n) * gap
     return float(ece)
+
+
+def apply_temperature(confidence: float, temperature: float) -> float:
+    """Rescale a confidence by a post-hoc temperature ``T`` — §12 Q3 (Guo et al. 2017).
+
+    Temperature scaling operates on the **logit**: ``p' = σ(logit(p) / T)``. ``T > 1``
+    *softens* an overconfident probability toward 0.5; ``T < 1`` sharpens; ``T == 1`` is
+    the identity. The confidence is clamped off ``{0, 1}`` so the logit is finite.
+
+    Args:
+        confidence: a probability in ``[0, 1]`` (e.g. a verdict-token logprob → exp).
+        temperature: the scaling temperature ``T`` (> 0).
+
+    Returns:
+        The recalibrated probability in ``(0, 1)``.
+
+    Raises:
+        ValueError: if ``temperature <= 0`` or ``confidence`` is outside ``[0, 1]``.
+    """
+    if temperature <= 0.0:
+        raise ValueError(f"temperature must be > 0, got {temperature}")
+    if not 0.0 <= confidence <= 1.0:
+        raise ValueError(f"confidence must be in [0, 1], got {confidence}")
+    p = min(max(confidence, _TEMP_EPS), 1.0 - _TEMP_EPS)
+    z = math.log(p / (1.0 - p)) / temperature
+    return 1.0 / (1.0 + math.exp(-z))
+
+
+def fit_temperature(records: list[JudgmentRecord], *, max_temp: float = 100.0) -> float:
+    """Fit the single post-hoc temperature ``T`` that best calibrates confidence — §12 Q3.
+
+    Temperature scaling (Guo et al. 2017, "On Calibration of Modern Neural Networks",
+    arXiv:1706.04599) fits one scalar ``T`` minimizing the negative log-likelihood of
+    correctness under ``σ(logit(confidence) / T)``. §12 Q3 prescribes it as the post-hoc
+    calibration step on the verdict-token logprob confidence (NOT a verbalized number —
+    Xiong et al. 2024). It cannot change *which* verdict a judge picked (monotonic in the
+    confidence), only how well the confidence *magnitude* tracks correctness — so it
+    lowers ECE without touching accuracy/agreement.
+
+    The fit is **in-sample** unless the caller splits the records; a held-out split is the
+    honest next step (see :func:`temperature_scaled_ece`'s note + the run report caveat).
+
+    Args:
+        records: the judge's records; those with ``confidence is None`` are ignored.
+        max_temp: the upper bound on the search (default 100; the lower bound is 0.05).
+
+    Returns:
+        The fitted ``T``. Returns ``1.0`` (the identity — no scaling) when calibration
+        cannot be fit: fewer than two confidences, or only one correctness class present
+        (all-right or all-wrong gives a degenerate, overfit ``T``).
+
+    Raises:
+        ValueError: if ``records`` is empty or a confidence is outside ``[0, 1]``.
+    """
+    _require_records(records, "fit_temperature")
+    conf: list[float] = []
+    corr: list[float] = []
+    for r in records:
+        if r.confidence is None:
+            continue
+        if not 0.0 <= r.confidence <= 1.0:
+            raise ValueError(
+                f"confidence must be in [0, 1], got {r.confidence} for item {r.item_id!r}"
+            )
+        conf.append(float(r.confidence))
+        corr.append(1.0 if _is_correct(r) else 0.0)
+
+    if len(conf) < 2:
+        return 1.0
+    y = np.asarray(corr)
+    if y.min() == y.max():
+        # one correctness class only — NLL is minimized by T→0 (a degenerate sharpen);
+        # there is nothing to calibrate against, so return the identity.
+        return 1.0
+
+    p = np.clip(np.asarray(conf), _TEMP_EPS, 1.0 - _TEMP_EPS)
+    z = np.log(p / (1.0 - p))
+
+    def _nll(temp: float) -> float:
+        scaled = 1.0 / (1.0 + np.exp(-z / temp))
+        scaled = np.clip(scaled, _TEMP_EPS, 1.0 - _TEMP_EPS)
+        return float(-np.mean(y * np.log(scaled) + (1.0 - y) * np.log(1.0 - scaled)))
+
+    res = minimize_scalar(_nll, bounds=(0.05, max_temp), method="bounded")
+    return float(res.x) if res.success else 1.0
+
+
+def temperature_scaled_ece(
+    records: list[JudgmentRecord],
+    *,
+    temperature: float | None = None,
+    n_bins: int = 10,
+) -> tuple[float, float | None, float | None]:
+    """Fit (or apply) a temperature and report ECE before vs after — §12 Q3.
+
+    Returns ``(temperature, ece_raw, ece_scaled)``. ``temperature`` is fit via
+    :func:`fit_temperature` when not supplied. ``ece_raw``/``ece_scaled`` are the
+    :func:`expected_calibration_error` before and after rescaling each confidence by
+    :func:`apply_temperature`; both are ``None`` when no record carries a confidence (the
+    "calibration not measured" outcome — §12). The fit is in-sample (see the caveat in
+    :func:`fit_temperature`): a proper held-out split is the honest improvement.
+
+    Args:
+        records: the judge's records (non-empty).
+        temperature: use this ``T`` instead of fitting one (e.g. a held-out fit).
+        n_bins: ECE bin count (passed through to :func:`expected_calibration_error`).
+
+    Returns:
+        ``(T, ece_raw, ece_scaled)`` — ``T`` is ``1.0`` when calibration is unmeasured.
+    """
+    raw = expected_calibration_error(records, n_bins=n_bins)
+    if raw is None:
+        return (1.0, None, None)
+    temp = fit_temperature(records) if temperature is None else float(temperature)
+    if temp <= 0.0:
+        raise ValueError(f"temperature must be > 0, got {temp}")
+    scaled_records = [
+        r if r.confidence is None else replace(r, confidence=apply_temperature(r.confidence, temp))
+        for r in records
+    ]
+    scaled = expected_calibration_error(scaled_records, n_bins=n_bins)
+    return (temp, raw, scaled)
 
 
 def position_bias(records: list[JudgmentRecord]) -> float:

@@ -41,14 +41,17 @@ from crucible.characterize.aggregate import (
 from crucible.characterize.metrics import (
     agreement,
     alt_test_omega,
+    apply_temperature,
     consistency,
     difficulty_weighted_accuracy,
     expected_calibration_error,
     family_pref_delta,
+    fit_temperature,
     kappa_zscore,
     objective_accuracy,
     position_bias,
     quality_score,
+    temperature_scaled_ece,
     verbosity_bias,
 )
 from crucible.characterize.profile import (
@@ -948,6 +951,83 @@ def test_profile_is_deterministic() -> None:
     assert p1.kappa_z == p2.kappa_z
     assert p1.reliability_weight == p2.reliability_weight
     assert not math.isnan(p1.kappa_z)
+
+
+# --------------------------------------------------------------------------- #
+# §12 Q3 — post-hoc temperature scaling (Guo et al. 2017) lowers ECE
+# --------------------------------------------------------------------------- #
+
+
+def _conf_rec(item_id: str, conf: float, correct: bool) -> JudgmentRecord:
+    return JudgmentRecord(
+        item_id=item_id,
+        model_id="m",
+        predicted=1 if correct else 0,
+        gold=1,
+        correct=correct,
+        confidence=conf,
+    )
+
+
+def _overconfident_records() -> list[JudgmentRecord]:
+    """20 records: confidence ~0.8–0.9 but only 60% correct (an overconfident judge)."""
+    recs = [_conf_rec(f"a{k}", 0.9, k < 6) for k in range(10)]
+    recs += [_conf_rec(f"b{k}", 0.8, k < 6) for k in range(10)]
+    return recs
+
+
+def test_apply_temperature_identity_soften_sharpen() -> None:
+    assert apply_temperature(0.9, 1.0) == pytest.approx(0.9)
+    assert 0.5 < apply_temperature(0.9, 5.0) < 0.9  # T>1 softens toward 0.5
+    assert apply_temperature(0.9, 0.5) > 0.9  # T<1 sharpens toward 1
+    assert apply_temperature(0.5, 3.0) == pytest.approx(0.5)  # 0.5 is the fixed point
+
+
+def test_apply_temperature_validation() -> None:
+    with pytest.raises(ValueError, match="temperature must be > 0"):
+        apply_temperature(0.9, 0.0)
+    with pytest.raises(ValueError, match="confidence must be in"):
+        apply_temperature(1.5, 1.0)
+
+
+def test_fit_temperature_overconfident_gives_temp_above_one() -> None:
+    assert fit_temperature(_overconfident_records()) > 1.0
+
+
+def test_fit_temperature_degenerate_returns_identity() -> None:
+    # one correctness class only → nothing to calibrate → identity
+    all_right = [_conf_rec(f"r{k}", 0.9, True) for k in range(5)]
+    assert fit_temperature(all_right) == 1.0
+    # fewer than two confidences → identity
+    one_conf = [
+        _conf_rec("c", 0.9, True),
+        JudgmentRecord(item_id="n", model_id="m", predicted=1, gold=1, correct=False),
+    ]
+    assert fit_temperature(one_conf) == 1.0
+
+
+def test_fit_temperature_empty_raises() -> None:
+    with pytest.raises(ValueError, match="at least one"):
+        fit_temperature([])
+
+
+def test_temperature_scaled_ece_improves_overconfident() -> None:
+    temp, raw, scaled = temperature_scaled_ece(_overconfident_records())
+    assert temp > 1.0
+    assert raw is not None and scaled is not None
+    assert scaled < raw  # softening an overconfident judge lowers ECE
+
+
+def test_temperature_scaled_ece_none_when_no_confidence() -> None:
+    recs = [JudgmentRecord(item_id="n", model_id="m", predicted=1, gold=1, correct=True)]
+    assert temperature_scaled_ece(recs) == (1.0, None, None)
+
+
+def test_temperature_scaled_ece_accepts_given_temperature() -> None:
+    recs = _overconfident_records()
+    temp, raw, scaled = temperature_scaled_ece(recs, temperature=1.0)
+    assert temp == 1.0
+    assert scaled == pytest.approx(raw)  # T=1 → identity → ECE unchanged
 
 
 # --------------------------------------------------------------------------- #

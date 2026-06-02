@@ -45,6 +45,7 @@ from crucible.calibration import irt
 from crucible.calibration.loader import load_items
 from crucible.calibration.types import CalibrationCategory, CalibrationItem
 from crucible.characterize import aggregate
+from crucible.characterize.metrics import temperature_scaled_ece
 from crucible.characterize.panel_store import save_panel
 from crucible.characterize.profile import build_profile, perturbation_audit
 from crucible.characterize.types import JudgeProfile, JudgmentRecord, RoleSlot
@@ -326,6 +327,32 @@ def perturbation_report(records: dict[str, list[JudgmentRecord]]) -> dict[str, A
     }
 
 
+def calibration_report(records: dict[str, list[JudgmentRecord]]) -> dict[str, Any]:
+    """Per-model post-hoc temperature scaling — §12 Q3 (Guo et al. 2017).
+
+    Reports each judge's fitted temperature + ECE before vs after rescaling the
+    verdict-token-logprob confidence. The fit is IN-SAMPLE (a held-out split is the
+    honest next step — surfaced in the note so a reader never mistakes the scaled ECE
+    for an out-of-sample number).
+    """
+    out: dict[str, Any] = {}
+    for model_id, recs in records.items():
+        try:
+            temp, raw, scaled = temperature_scaled_ece(recs)
+        except Exception as exc:  # noqa: BLE001
+            out[model_id] = {"error": repr(exc)}
+            continue
+        out[model_id] = {
+            "temperature": round(temp, 4),
+            "ece_raw": round(raw, 4) if raw is not None else None,
+            "ece_scaled": round(scaled, 4) if scaled is not None else None,
+        }
+    return {
+        "by_model": out,
+        "note": "temperature scaling (Guo 2017) fit IN-SAMPLE (§12 Q3); held-out split is next",
+    }
+
+
 def panel_composition_report(
     profiles: dict[str, JudgeProfile], records: dict[str, list[JudgmentRecord]]
 ) -> dict[str, Any]:
@@ -371,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
         "panel_correlation": panel_correlation_report(records),
         "irt_prune": irt_prune_report(records),
         "perturbation": perturbation_report(records),
+        "calibration": calibration_report(records),
         "panel_composition": panel_composition_report(profiles, records),
     }
     args.out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
