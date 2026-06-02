@@ -1,23 +1,23 @@
-# Kickoff — crucible Phase-2 forks (dogfood swarm)
+# Kickoff — ai-crucible Phase-2 forks (dogfood swarm)
 
 **Paste this as a new session's first message (or: "Read `docs/phase-2/kickoff-forks-swarm.md` and run the dogfood swarm").**
-**Authored:** end of the 2026-06-01 calibration+panel session. **Branch:** `phase-2` @ `5c3d6f6` (origin: `dogfood-lab/crucible`).
+**Authored:** end of the 2026-06-01 calibration+panel session. **Branch:** `phase-2` @ `5c3d6f6` (origin: `dogfood-lab/ai-crucible`).
 
 ---
 
-## What crucible is (frame — read before acting)
+## What ai-crucible is (frame — read before acting)
 
-crucible is a **diagnostic auditing game / measurement instrument**: a thin policy layer over Inspect AI that seats a cross-family panel of local judges to score Solver attempts under a sealed measurement boundary. It is **not** a toy — it is studio infrastructure (the measurement arm). Canon-first; do **not** shrink scope; do **not** scaffold GDOS; do **not** propose smaller-tool shortcuts. Full mission frame in `E:/AI/.claude/CLAUDE.md` + `C:/Users/mikey/.claude/projects/F--AI/memory/user_profile.md`.
+ai-crucible is a **diagnostic auditing game / measurement instrument**: a thin policy layer over Inspect AI that seats a cross-family panel of local judges to score Solver attempts under a sealed measurement boundary. It is **not** a toy — it is studio infrastructure (the measurement arm). Canon-first; do **not** shrink scope; do **not** scaffold GDOS; do **not** propose smaller-tool shortcuts. Full mission frame in `E:/AI/.claude/CLAUDE.md` + `C:/Users/mikey/.claude/projects/F--AI/memory/user_profile.md`.
 
-**Path rule (Robot rig):** every `F:/AI/...` in any memory/skill/doc is read as `E:/AI/...`. Workspace is `E:/AI/dogfood-lab/crucible`.
+**Path rule (Robot rig):** every `F:/AI/...` in any memory/skill/doc is read as `E:/AI/...`. Workspace is `E:/AI/dogfood-lab/ai-crucible`.
 
 ## Where the last session left it (state)
 
 A complete vertical slice shipped on `phase-2` (9 commits): **characterize → compose → persist → score**, end to end.
 
-- **Characterization** (`src/crucible/characterize/`): `run.py` driver (A/B pairs + PASS/FAIL, two-pass model-jury bootstrap, authored `item_id`, IRT-prune + perturbation + calibration + panel-composition report sections), `metrics.py` (the §11.1 six + ECE + **temperature scaling, held-out k-fold** §12 Q3), `profile.py` (one-sided κ gate, continuous quality score, selective CI seat/screen/reject, `perturbation_audit`), `aggregate.py` (ρ-submodularity, reliability-weighted vote, minority-veto, **`compose_panel`** + `SeatedPanel`), `panel_store.py` (durable artifact save/load), `calibration/irt.py` (model-free point-biserial/variance prune).
-- **Scoring** (`src/crucible/scoring/judge_panel.py`): `"weighted"` reducer (CARE), `weighted_judge`, `JudgePanel.from_seated`.
-- **Kernel** (`src/crucible/kernel.py`): `run_attempt(..., panel=...)` accepts a pre-composed panel.
+- **Characterization** (`src/ai_crucible/characterize/`): `run.py` driver (A/B pairs + PASS/FAIL, two-pass model-jury bootstrap, authored `item_id`, IRT-prune + perturbation + calibration + panel-composition report sections), `metrics.py` (the §11.1 six + ECE + **temperature scaling, held-out k-fold** §12 Q3), `profile.py` (one-sided κ gate, continuous quality score, selective CI seat/screen/reject, `perturbation_audit`), `aggregate.py` (ρ-submodularity, reliability-weighted vote, minority-veto, **`compose_panel`** + `SeatedPanel`), `panel_store.py` (durable artifact save/load), `calibration/irt.py` (model-free point-biserial/variance prune).
+- **Scoring** (`src/ai_crucible/scoring/judge_panel.py`): `"weighted"` reducer (CARE), `weighted_judge`, `JudgePanel.from_seated`.
+- **Kernel** (`src/ai_crucible/kernel.py`): `run_attempt(..., panel=...)` accepts a pre-composed panel.
 - **Grounding:** `docs/research-grounding.md` §11/§12/§12.1 (design lock + corrected-run receipts); raw study-swarms in `docs/phase-2/{calibration.md, grounding-research.md}`.
 - **Gates:** `uv run ruff check .` clean; `uv run pytest -q` = **443 passed**, green ×3.
 - **The corrected run (6 models × 51 pairs × k=3):** seated = qwen3.6:27b, gemma4:31b, granite4.1:30b (the three κ≈1.0 judges the *old inverted* gate wrongly screened); ECE measured via logprob; ρ/known-groups/IRT-prune/perturbation all real. Raw report is gitignored (`char-*.json`).
@@ -29,7 +29,7 @@ A complete vertical slice shipped on `phase-2` (9 commits): **characterize → c
 3. **The model jury CANNOT be the alt-test reference** — it is circular (Calderon 2025). Fork C exists precisely to replace it with humans. Keep the `_ALT_TEST_CAVEAT` loud until then.
 4. **Honesty surfaces:** any shortcut/cap/assumption is documented loudly in code + report + §12, never buried.
 5. **Six workflow standards** apply (`E:/AI/.claude/rules/workflow-standards.md`); every new runner/workflow file carries a "Standards compliance" section.
-6. **Preview-plugin override:** crucible is a CLI/library, not web — never call preview/screenshot tools.
+6. **Preview-plugin override:** ai-crucible is a CLI/library, not web — never call preview/screenshot tools.
 7. Translations (if any docs ship) run **locally** via Ollama — never on Claude tokens. (Not expected here.)
 
 ## How to run things
@@ -37,7 +37,7 @@ A complete vertical slice shipped on `phase-2` (9 commits): **characterize → c
 ```
 # characterization panel (sequential serving — VRAM-respecting on the Omen RTX 5090):
 OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 \
-  uv run python -m crucible.characterize.run --k 3 \
+  uv run python -m ai_crucible.characterize.run --k 3 \
   --out char-panel-report.json --write-panel docs/phase-2/panel.json
 # gates:
 uv run ruff check .
@@ -54,7 +54,7 @@ Run as a **dogfood swarm**: Wave 0 (coordinator locks the cross-cutting contract
 ### Fork A — Expand the discriminating pair set (instrument quality) — **no GPU to author**
 
 - **Why:** the IRT prune kept only **15 of 51** items; the set saturates at the top for the strong judges. Top judges should sit near the ~64% ceiling (JudgeBench, arXiv:2410.12784), not 100%.
-- **Goal:** author **~30–50 more** plausible-vs-subtly-wrong A/B pairs into `src/crucible/calibration/admission_pairs.json`. Difficulty centered ~0.5–0.65 with tails (PSN-IRT, arXiv:2505.15055); balanced `gold` A/B and `correct_side` position; diverse, *new* `flaw_family` coverage and constructs.
+- **Goal:** author **~30–50 more** plausible-vs-subtly-wrong A/B pairs into `src/ai_crucible/calibration/admission_pairs.json`. Difficulty centered ~0.5–0.65 with tails (PSN-IRT, arXiv:2505.15055); balanced `gold` A/B and `correct_side` position; diverse, *new* `flaw_family` coverage and constructs.
 - **Contract (Wave 0):** item schema is fixed by `calibration/loader.py` + `calibration/types.py` — `id` (unique), `category` (use `difficulty_anchor`; reserve a few `known_trivial`/`known_impossible` anchors), `construct`, `confound_controlled`, `prompt` (ends "Reply with exactly one letter: A or B."), `gold` ∈ {A,B}, `difficulty`, `expected_pass{strong,weak}`, `metadata{flaw_family, correct_side}`. The loader rejects unknown keys + duplicate ids — it is the verifier.
 - **Leaf split (DECOMPOSE_BY_SECRETS):** one agent per flaw-family slice (e.g. off-by-one, unit-conversion, quantifier/logic, code-semantics, fabricated-fact-among-real, order-of-operations, statistical-trap). Each writes a disjoint block of new items; the coordinator merges into one JSON and re-balances position.
 - **Verify:** `load_default`/`load_items` loads clean; position balance ≈50/50; difficulty histogram has tails; (later, GPU-gated) re-pilot keeps **>15** discriminating items.
@@ -96,7 +96,7 @@ Run as a **dogfood swarm**: Wave 0 (coordinator locks the cross-cutting contract
 
 ## Pointers
 
-- Code: `src/crucible/characterize/{run,metrics,profile,aggregate,panel_store}.py`, `src/crucible/calibration/{admission_pairs.json,loader,types}.py`, `calibration/irt.py`, `src/crucible/scoring/judge_panel.py`, `src/crucible/kernel.py`
+- Code: `src/ai_crucible/characterize/{run,metrics,profile,aggregate,panel_store}.py`, `src/ai_crucible/calibration/{admission_pairs.json,loader,types}.py`, `calibration/irt.py`, `src/ai_crucible/scoring/judge_panel.py`, `src/ai_crucible/kernel.py`
 - Tests: `tests/test_{characterize,characterize_run,calibration,models,scoring,kernel,panel_store}.py`
 - Grounding: `docs/research-grounding.md` §11/§12/§12.1; raw: `docs/phase-2/{calibration,grounding-research}.md`
 - Protocols: dogfood-swarm + `study-swarm` (research-grounded-advisor) in `C:/Users/mikey/.claude/projects/F--AI/memory/research-grounded-advisor-protocol.md`; workflow standards in `E:/AI/.claude/rules/workflow-standards.md`

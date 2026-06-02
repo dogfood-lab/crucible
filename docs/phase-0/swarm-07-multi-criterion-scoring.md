@@ -8,7 +8,7 @@
 
 # Research grounding: multi-criterion scoring for adversarial LLM evaluation
 
-Six findings, each tied to a specific design implication for the crucible's graded scoring framework.
+Six findings, each tied to a specific design implication for the ai-crucible's graded scoring framework.
 
 ---
 
@@ -40,7 +40,7 @@ HumanEval+ adds 80× more test cases than HumanEval; under the stronger oracle, 
 **6. Mialon et al. 2023 — "GAIA: a benchmark for General AI Assistants" (arXiv:2311.12983)**
 https://arxiv.org/abs/2311.12983
 GAIA reports accuracy stratified by 3 difficulty levels AND total cost in USD as separate axes — explicitly refusing to collapse them into a single scalar. The leaderboard exposes the trade-off: a model that's 5% more accurate but 10× more expensive is shown as such, not hidden behind a weighted sum.
-**Implication:** consider whether the crucible's net score should be a single gate or a Pareto-style multi-axis report — the hard gate could fire only when ALL criteria clear individual thresholds (lexicographic / conjunctive), with the weighted sum as a secondary tiebreaker. This is more Goodhart-resistant than a pure weighted sum because no single dimension can compensate for a sub-threshold other dimension.
+**Implication:** consider whether the ai-crucible's net score should be a single gate or a Pareto-style multi-axis report — the hard gate could fire only when ALL criteria clear individual thresholds (lexicographic / conjunctive), with the weighted sum as a secondary tiebreaker. This is more Goodhart-resistant than a pure weighted sum because no single dimension can compensate for a sub-threshold other dimension.
 
 ---
 

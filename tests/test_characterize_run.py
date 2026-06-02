@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from crucible.calibration.types import CalibrationCategory, CalibrationItem
-from crucible.characterize.run import (
+from ai_crucible.calibration.types import CalibrationCategory, CalibrationItem
+from ai_crucible.characterize.run import (
     _jury,
     _parse_models,
     _to_num,
@@ -14,7 +14,7 @@ from crucible.characterize.run import (
     parse_choice,
     parse_verdict,
 )
-from crucible.characterize.types import JudgeProfile, JudgmentRecord, RoleSlot, SeatDecision
+from ai_crucible.characterize.types import JudgeProfile, JudgmentRecord, RoleSlot, SeatDecision
 
 
 def _rec(item_id: str, model_id: str, *, correct: bool, gold: int = 1) -> JudgmentRecord:

@@ -1,4 +1,4 @@
-"""Tests for the puzzle loader (crucible.puzzle).
+"""Tests for the puzzle loader (ai_crucible.puzzle).
 
 Discipline (dogfood-swarm): for every invariant we assert the happy path AND
 prove the failing path goes RED. The load-bearing invariant here is the sealed
@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from crucible.puzzle import LoadedPuzzle, PuzzleLoadError, load_puzzle
-from crucible.types import PuzzleClass, PuzzleMeta
+from ai_crucible.puzzle import LoadedPuzzle, PuzzleLoadError, load_puzzle
+from ai_crucible.types import PuzzleClass, PuzzleMeta
 
 FIXTURE = Path(__file__).parent / "fixtures" / "puzzles" / "sample"
 

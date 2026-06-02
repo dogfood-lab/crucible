@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from crucible.characterize.aggregate import SeatedJudge, SeatedPanel
-from crucible.characterize.panel_store import (
+from ai_crucible.characterize.aggregate import SeatedJudge, SeatedPanel
+from ai_crucible.characterize.panel_store import (
     SCHEMA_VERSION,
     PanelArtifactError,
     load_panel,

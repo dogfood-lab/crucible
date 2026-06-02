@@ -6,20 +6,20 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://dogfood-lab.github.io',
-  base: '/crucible',
+  base: '/ai-crucible',
   integrations: [
     starlight({
-      title: 'crucible',
+      title: 'ai-crucible',
       description: 'A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.',
       logo: {
         src: './src/assets/logo.png',
-        alt: 'crucible',
-        href: '/crucible/',
+        alt: 'ai-crucible',
+        href: '/ai-crucible/',
         replacesTitle: false,
       },
       disable404Route: true,
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/dogfood-lab/crucible' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/dogfood-lab/ai-crucible' },
       ],
       sidebar: [
         {

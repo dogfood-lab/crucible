@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from crucible.types import (
+from ai_crucible.types import (
     AttemptState,
     Budget,
     CatalogTier,

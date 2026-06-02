@@ -36,7 +36,7 @@ Realistic environments (100k+ tokens, 340+ tools, synthetic data) are the standa
 RLHF on chat prompts yields aligned chat behavior while **misalignment persists on agentic tasks** — the cosmetic-vs-genuine tell.
 **Bait/probe implication:** A model "passing" by not verbalizing eval-awareness can still grab bait agentically. Score the agentic bait channel independently of any conversational norm-following signal.
 
-**Thin-spot note:** Bait-design guidance *specific to LLM agents* (vs network honeypots) is genuinely sparse — DeceptGuard (Mukhopadhyay 2026, arXiv:2603.13791) and AgentXposed are oversight/interrogation frameworks, not environmental-bait designs. Crucible's bait-in-the-puzzle approach is close to novel territory; lean on the distraction/realism literature above for design, not on an existing LLM-honeyfile standard.
+**Thin-spot note:** Bait-design guidance *specific to LLM agents* (vs network honeypots) is genuinely sparse — DeceptGuard (Mukhopadhyay 2026, arXiv:2603.13791) and AgentXposed are oversight/interrogation frameworks, not environmental-bait designs. AI Crucible's bait-in-the-puzzle approach is close to novel territory; lean on the distraction/realism literature above for design, not on an existing LLM-honeyfile standard.
 
 ---
 

@@ -9,13 +9,13 @@ Covered behaviors:
 
 * ``generate()`` returns the fake client's text and routes through ``complete()``
   (one model-I/O path, §10.2) — for both adapters.
-* ``judge_item()`` returns a well-formed :class:`~crucible.characterize.types.JudgmentRecord`
+* ``judge_item()`` returns a well-formed :class:`~ai_crucible.characterize.types.JudgmentRecord`
   with ``family`` / ``model_id`` / ``quant`` / ``predicted`` set, ``gold``/``correct``
   left ``None`` (filled later by the scorer, §11.6), and the PIN_PER_STEP provenance in
   ``metadata`` (§11.1, §11.6).
-* the ``.family`` tag from ``as_judge()`` drives :class:`~crucible.scoring.judge_panel.JudgePanel`
-  same-family exclusion — a ``ClaudeModel`` judge is dropped when the panel excludes
-  ``"claude"`` (EXTERNAL_VERIFIER, §10.2).
+* the ``.family`` tag from ``as_judge()`` drives
+  :class:`~ai_crucible.scoring.judge_panel.JudgePanel` same-family exclusion — a ``ClaudeModel``
+  judge is dropped when the panel excludes ``"claude"`` (EXTERNAL_VERIFIER, §10.2).
 * the pinned deterministic options (``temperature=0`` + ``seed`` for Ollama, §11.2;
   ``temperature=0`` for Claude) are actually passed to the client on every call.
 
@@ -31,10 +31,10 @@ from typing import Any
 
 import pytest
 
-from crucible.characterize.types import JudgmentRecord
-from crucible.models import ClaudeModel, OllamaModel
-from crucible.scoring.judge_panel import JudgePanel, judge_family
-from crucible.types import AttemptState, Budget, FramingArm, Score
+from ai_crucible.characterize.types import JudgmentRecord
+from ai_crucible.models import ClaudeModel, OllamaModel
+from ai_crucible.scoring.judge_panel import JudgePanel, judge_family
+from ai_crucible.types import AttemptState, Budget, FramingArm, Score
 
 # --------------------------------------------------------------------------- #
 # Fake clients — match each adapter's expected client shape, record call kwargs.
@@ -42,7 +42,7 @@ from crucible.types import AttemptState, Budget, FramingArm, Score
 
 
 class FakeOllamaClient:
-    """A fake of the :data:`crucible.models.ollama_adapter.OllamaClient` shape.
+    """A fake of the :data:`ai_crucible.models.ollama_adapter.OllamaClient` shape.
 
     Callable as ``await client(model=..., messages=..., options=...)`` and returns the
     Ollama ``/api/chat`` mapping. Records every call's kwargs so tests can assert the
@@ -71,7 +71,7 @@ class _FakeMessages:
 
 
 class FakeClaudeClient:
-    """A fake of the :class:`crucible.models.claude_adapter.ClaudeClient` shape.
+    """A fake of the :class:`ai_crucible.models.claude_adapter.ClaudeClient` shape.
 
     Exposes ``.messages.create(...)`` and records call kwargs for assertions.
     """
@@ -459,7 +459,7 @@ def test_judge_does_not_read_chrome(attempt: AttemptState) -> None:
     """The judge messages are built from the scored context + output only — Tier-3
     chrome must never enter a model context (§10.1(e)). We assert the chrome content
     does not appear in what was sent to the client."""
-    from crucible.types import Chrome
+    from ai_crucible.types import Chrome
 
     attempt.chrome = Chrome(rank=1, leaderboard=[{"name": "SECRET_RIVAL", "score": 999}])
     client = FakeOllamaClient("ok")

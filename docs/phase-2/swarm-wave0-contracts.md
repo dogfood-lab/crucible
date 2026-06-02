@@ -10,10 +10,10 @@ halt a bad block before integration (ANDON_AUTHORITY).
 
 ## Fork A — calibration item contract
 
-New items are appended to [`src/crucible/calibration/admission_pairs.json`](../../src/crucible/calibration/admission_pairs.json)
+New items are appended to [`src/ai_crucible/calibration/admission_pairs.json`](../../src/ai_crucible/calibration/admission_pairs.json)
 (currently 51 items: 45 `known_diagnostic` + 6 `difficulty_anchor`; gold 26A/25B; difficulty
 0.10–0.75, mean 0.52; ~95% numeric/arithmetic flaw families). The **loader is the verifier**
-([`loader.py`](../../src/crucible/calibration/loader.py)): it rejects unknown keys and
+([`loader.py`](../../src/ai_crucible/calibration/loader.py)): it rejects unknown keys and
 duplicate ids.
 
 ### Why we expand (the saturation problem)
@@ -83,9 +83,9 @@ flaw must be genuine and checkable — the *gold* side is provably correct.
 
 ## Fork C — human alt-test label contract
 
-Retires the **circular** model-jury ω (`_ALT_TEST_CAVEAT`, [`run.py`](../../src/crucible/characterize/run.py))
+Retires the **circular** model-jury ω (`_ALT_TEST_CAVEAT`, [`run.py`](../../src/ai_crucible/characterize/run.py))
 by feeding **real human annotators** into the existing
-[`alt_test_omega`](../../src/crucible/characterize/metrics.py) leave-one-out. The model-jury
+[`alt_test_omega`](../../src/ai_crucible/characterize/metrics.py) leave-one-out. The model-jury
 bias this fixes is canon (Panickssery 2024 self-preference, ~20–40pp — see `memory/crucible.md`).
 
 ### `human_labels.json` schema (locked core shape)

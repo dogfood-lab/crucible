@@ -2,10 +2,11 @@
 
 Covers the four pieces that retire the circular model-jury ω:
 
-* :func:`crucible.characterize.metrics.alt_test` — the audit-ready ω (ε + paired t-test +
+* :func:`ai_crucible.characterize.metrics.alt_test` — the audit-ready ω (ε + paired t-test +
   Benjamini-Yekutieli FDR against human annotators) and :func:`krippendorff_alpha` (sparse IAA);
-* :func:`crucible.scoring.stats.conformal_coverage_interval` — the honest small-N coverage spread;
-* :mod:`crucible.characterize.human_labels` — loading/validating ``human_labels.json``;
+* :func:`ai_crucible.scoring.stats.conformal_coverage_interval` — the honest small-N coverage
+  spread;
+* :mod:`ai_crucible.characterize.human_labels` — loading/validating ``human_labels.json``;
 * the end-to-end human-grounded :func:`build_profile` path.
 
 These are synthetic-label tests (the kickoff's Fork-C verify criterion: "ω computed against
@@ -18,16 +19,16 @@ import json
 
 import pytest
 
-from crucible.calibration.types import CalibrationCategory, CalibrationItem
-from crucible.characterize.human_labels import (
+from ai_crucible.calibration.types import CalibrationCategory, CalibrationItem
+from ai_crucible.characterize.human_labels import (
     HumanLabelError,
     build_records_per_annotator,
     load_human_labels,
 )
-from crucible.characterize.metrics import alt_test, krippendorff_alpha
-from crucible.characterize.profile import build_profile
-from crucible.characterize.types import JudgmentRecord, RoleSlot, SeatDecision
-from crucible.scoring.stats import conformal_coverage_interval
+from ai_crucible.characterize.metrics import alt_test, krippendorff_alpha
+from ai_crucible.characterize.profile import build_profile
+from ai_crucible.characterize.types import JudgmentRecord, RoleSlot, SeatDecision
+from ai_crucible.scoring.stats import conformal_coverage_interval
 
 
 def _rec(item: str, pred: int, ann: str, gold: int | None = None) -> JudgmentRecord:

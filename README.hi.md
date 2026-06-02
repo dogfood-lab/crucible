@@ -3,16 +3,16 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="crucible" width="400" />
+  <img src="assets/logo.png" alt="ai-crucible" width="400" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/python-3.11%E2%80%933.13-blue.svg" alt="Python 3.11–3.13" />
   <img src="https://img.shields.io/badge/coverage-96%25-brightgreen.svg" alt="Coverage 96%" />
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.2.0-orange.svg" alt="Version 0.2.0" /></a>
-  <a href="https://dogfood-lab.github.io/crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
+  <a href="https://dogfood-lab.github.io/ai-crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
 </p>
 
 <p align="center"><b>A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.</b></p>
@@ -58,7 +58,7 @@
 uv sync --extra dev --extra stats
 
 # Run the test suite (with the coverage gate)
-uv run pytest --cov=crucible --cov-report=term-missing
+uv run pytest --cov=ai-crucible --cov-report=term-missing
 
 # Lint
 uv run ruff check .
@@ -69,7 +69,7 @@ bash verify.sh
 
 ## प्रलेखन
 
-- **[हैंडबुक](https://dogfood-lab.github.io/crucible/)** - गाइड, आर्किटेक्चर और संदर्भ।
+- **[हैंडबुक](https://dogfood-lab.github.io/ai-crucible/)** - गाइड, आर्किटेक्चर और संदर्भ।
 - [`docs/research-grounding.md`](docs/research-grounding.md) - डिजाइन तर्क, उद्धरणों के साथ।
 - [`docs/gameplan.md`](docs/gameplan.md) - रोडमैप और खुले प्रश्न।
 - [`SECURITY.md`](SECURITY.md) - खतरा मॉडल + ईमानदार अवशिष्ट-जोखिम प्रकटीकरण।

@@ -1,4 +1,4 @@
-"""Smoke tests for the locked cross-module contracts (crucible.types).
+"""Smoke tests for the locked cross-module contracts (ai_crucible.types).
 
 These exist before the build wave so the foundation is provably green and the
 §8.3 reward-bound invariant is pinned (a meta-test that the validator actually
@@ -10,8 +10,8 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from crucible import __version__
-from crucible.types import (
+from ai_crucible import __version__
+from ai_crucible.types import (
     AttemptState,
     Budget,
     Chrome,

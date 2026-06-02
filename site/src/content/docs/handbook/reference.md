@@ -5,13 +5,13 @@ sidebar:
   order: 4
 ---
 
-This page documents crucible's public Python surface. Signatures are drawn from the source; the prose
+This page documents ai-crucible's public Python surface. Signatures are drawn from the source; the prose
 explains intent and the contract each call upholds.
 
 ## Kernel entry points
 
-`crucible.kernel` is the thin integrator: it wires the leaf modules together into the two entry points
-crucible runs on. Both are `async`.
+`ai_crucible.kernel` is the thin integrator: it wires the leaf modules together into the two entry points
+ai-crucible runs on. Both are `async`.
 
 ### `run_attempt`
 
@@ -78,7 +78,7 @@ every sibling). The puzzle is loaded once and shared. Raises `ValueError` if `k 
 
 ## Scoring functions
 
-`crucible.scoring.stats` ships the small-N statistics. All functions are pure and deterministic —
+`ai_crucible.scoring.stats` ships the small-N statistics. All functions are pure and deterministic —
 the same inputs grade identically tomorrow.
 
 ```python
@@ -114,7 +114,7 @@ The graduation rule, in one call: `True` iff the Wilson 95% interval satisfies
 
 ### The oracle gate
 
-`crucible.scoring.oracle` applies the conjunctive hard gate.
+`ai_crucible.scoring.oracle` applies the conjunctive hard gate.
 
 ```python
 @dataclass(slots=True)
@@ -141,7 +141,7 @@ breakdown, and the `failed_conditions`, so a failure is always legible. The crit
 
 ### The judge panel
 
-`crucible.scoring.judge_panel` is the external-verifier surface.
+`ai_crucible.scoring.judge_panel` is the external-verifier surface.
 
 ```python
 class JudgePanel:
@@ -166,7 +166,7 @@ exclusion would leave no eligible judges.
 
 ## Core data contracts
 
-`crucible.types` is the exclusive home of every cross-module type. The most load-bearing:
+`ai_crucible.types` is the exclusive home of every cross-module type. The most load-bearing:
 
 ### `AttemptState`
 
@@ -246,4 +246,4 @@ class Role(Protocol):
 
 An `act` must route all model I/O through the kernel's injected `generate` closure and must not read
 Tier-3 `chrome`. The five concrete roles (`Designer`, `Solver`, `Critic`, `Judge`, `CohortSolver`)
-live in `crucible.roles`; their slots are named by the `RoleName` enum.
+live in `ai_crucible.roles`; their slots are named by the `RoleName` enum.

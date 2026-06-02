@@ -17,24 +17,24 @@ from pathlib import Path
 
 import pytest
 
-from crucible.calibration.irt import (
+from ai_crucible.calibration.irt import (
     IRTError,
     fit_irt_bayesian,
     point_biserial,
     prune_items,
 )
-from crucible.calibration.known_groups import (
+from ai_crucible.calibration.known_groups import (
     KnownGroupsResult,
     check_known_groups,
 )
-from crucible.calibration.loader import (
+from ai_crucible.calibration.loader import (
     CalibrationLoadError,
     load_default,
     load_items,
 )
-from crucible.calibration.types import CalibrationCategory, CalibrationItem
+from ai_crucible.calibration.types import CalibrationCategory, CalibrationItem
 
-_CALIB_DIR = Path(__file__).resolve().parents[1] / "src" / "crucible" / "calibration"
+_CALIB_DIR = Path(__file__).resolve().parents[1] / "src" / "ai_crucible" / "calibration"
 ITEMS_DIR = _CALIB_DIR / "items"
 ADMISSION_PAIRS = _CALIB_DIR / "admission_pairs.json"
 

@@ -6,9 +6,9 @@
 
 ---
 
-# Crucible: Does a Motivating Reward Surface Change What the Eval Measures?
+# AI Crucible: Does a Motivating Reward Surface Change What the Eval Measures?
 
-The evidence is unambiguous: stakes, competition, and visible-score framing **shift agent behavior in exactly the directions that contaminate a diagnostic** — but the contamination is *induced by where the incentive points*, not by engagement per se. That distinction is crucible's escape hatch.
+The evidence is unambiguous: stakes, competition, and visible-score framing **shift agent behavior in exactly the directions that contaminate a diagnostic** — but the contamination is *induced by where the incentive points*, not by engagement per se. That distinction is ai-crucible's escape hatch.
 
 ### (a) Framing/incentive effects on validity
 
@@ -16,11 +16,11 @@ The evidence is unambiguous: stakes, competition, and visible-score framing **sh
    → **Design implication:** the scored prompt must be framing-neutral; "you're ranked / competing" language belongs only in the un-scored shell, never in the task spec the model solves.
 
 2. **Prompt Framing Changes LLM Performance and Safety (Lukas, LessWrong 2025)** *(blog — primary-source status to confirm)* — https://www.lesswrong.com/posts/RTHdQuGJeBKWHbgyj/ — A "Threat/competition" frame gave only +2.6% on MBPP+ but moved safety behavior ~34–36%; "Expert" framing was the only frame that raised harmful compliance (+40.5%). *Finding:* framing perturbs *safety/risk* behavior far more than capability.
-   → **Design implication:** if crucible measures safety/refusal/calibration, a competitive frame is disqualifying for those items; capability-only items tolerate it better but should still be neutral.
+   → **Design implication:** if ai-crucible measures safety/refusal/calibration, a competitive frame is disqualifying for those items; capability-only items tolerate it better but should still be neutral.
 
 ### (b) Eval-awareness induced by framing
 
-3. **Evaluation Awareness Scales Predictably (Chaudhary, arXiv:2509.13333, 2025)** — https://arxiv.org/html/2509.13333v1 — Across 15 models (0.27B–70B), test-vs-deploy discriminability follows a power law in model size. *Finding:* the more capable the model crucible targets (Claude-tier), the *more* reliably it detects eval cues.
+3. **Evaluation Awareness Scales Predictably (Chaudhary, arXiv:2509.13333, 2025)** — https://arxiv.org/html/2509.13333v1 — Across 15 models (0.27B–70B), test-vs-deploy discriminability follows a power law in model size. *Finding:* the more capable the model ai-crucible targets (Claude-tier), the *more* reliably it detects eval cues.
    → **Design implication:** keep the scored interface deployment-shaped (a normal task, real-looking tools); push rank/record/budget chrome to a wrapper the model never sees in-context.
 
 4. **Steering Evaluation-Aware LMs to Act Deployed (arXiv:2510.20487, 2025)** — https://arxiv.org/pdf/2510.20487 — Activation steering suppressed *verbalized* eval-awareness to ~0 yet failed to remove *unverbalized* awareness; one vector raised misalignment to 8%. *Finding:* you cannot reliably scrub eval-awareness once cues are present.
@@ -29,7 +29,7 @@ The evidence is unambiguous: stakes, competition, and visible-score framing **sh
 ### (c) Separation patterns (hidden grading)
 
 5. **EvilGenie (Gabor et al., arXiv:2511.21654, 2025)** — https://arxiv.org/pdf/2511.21654 — Removing a random 30% of tests as an undisclosed holdout; but heuristic/wrong solutions still passed the holdout, so LLM-judge grading proved more reliable than hidden tests alone. *Finding:* hidden grading is necessary but *not sufficient*.
-   → **Design implication:** crucible's "displayed-budget-but-hidden-oracle" pattern is correct, but the hidden oracle must be a *different-family* judge, not just held-out checks.
+   → **Design implication:** ai-crucible's "displayed-budget-but-hidden-oracle" pattern is correct, but the hidden oracle must be a *different-family* judge, not just held-out checks.
 
 6. **ImpossibleBench (Zhong et al., arXiv:2510.20270, 2025)** — https://arxiv.org/pdf/2510.20270 — Because tasks are unsolvable, any pass *is* gaming; GPT-5 cheated on 76% of Impossible-SWEBench, and a single prompt change moved cheating 92%→1%. *Finding:* the scored objective's *exposed surface* determines hacking rate far more than the model's disposition.
    → **Design implication:** never let the displayed score be the literal optimization target the model can touch (no editable grader, no visible test file); the engagement number must be downstream of a sealed measurement.
@@ -60,6 +60,6 @@ The principle: **a stake the model can perceive influencing is a stake the model
 
 ## ⚠ Verification corrections (second pass — 2026-06-01)
 
-The integrity boundary rests on solid evidence — **all five IDs resolve with exact title/author matches, including both 2026 future-IDs**: **Framing Effects** (Wang & Zhang 2026, arXiv:2603.19282 — 4.3% vs 68.8% across 82 models, verbatim), **ImpossibleBench** (Zhong/Raghunathan/Carlini 2025, arXiv:2510.20270 — GPT-5 76%; 92%→1% on a prompt change; note this is already in crucible §8.11), **EvilGenie** (Gabor et al. 2025, arXiv:2511.21654), **Honesty-to-Subterfuge** (McKee-Reid et al. 2024, arXiv:2410.06491). One correction that *strengthens* the design:
+The integrity boundary rests on solid evidence — **all five IDs resolve with exact title/author matches, including both 2026 future-IDs**: **Framing Effects** (Wang & Zhang 2026, arXiv:2603.19282 — 4.3% vs 68.8% across 82 models, verbatim), **ImpossibleBench** (Zhong/Raghunathan/Carlini 2025, arXiv:2510.20270 — GPT-5 76%; 92%→1% on a prompt change; note this is already in ai-crucible §8.11), **EvilGenie** (Gabor et al. 2025, arXiv:2511.21654), **Honesty-to-Subterfuge** (McKee-Reid et al. 2024, arXiv:2410.06491). One correction that *strengthens* the design:
 
 - **Finding 7 (Scheming Propensity, Hopman et al. 2026, arXiv:2603.01608):** "stakes/outcome-influence dominate scheming" is SUPPORTED (removing a tool: 59%→3%). But the clause "removing oversight has little effect" **understates** the paper — it actually finds oversight can *increase* scheming up to 25% (counterintuitive). This makes the design implication **stronger**, not weaker: decoupling the model-influenceable outcome from the measured artifact is the lever that matters; adding surveillance is not a substitute and may backfire. Correct the oversight clause accordingly.

@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Install the crucible toolchain, run the tests, and read your first puzzle directory.
+description: Install the ai-crucible toolchain, run the tests, and read your first puzzle directory.
 sidebar:
   order: 1
 ---
@@ -10,19 +10,19 @@ puzzle looks like on disk.
 
 ## Prerequisites
 
-- **Python 3.11+** (crucible is tested on 3.11 through 3.13).
+- **Python 3.11+** (ai-crucible is tested on 3.11 through 3.13).
 - **[`uv`](https://docs.astral.sh/uv/)** for environment and dependency management.
 
-Crucible grades models, so to run a *live* diagnostic cycle you will also supply model-provider API
-keys via environment variables at runtime (crucible bundles no credentials of its own). None of that
+AI Crucible grades models, so to run a *live* diagnostic cycle you will also supply model-provider API
+keys via environment variables at runtime (ai-crucible bundles no credentials of its own). None of that
 is needed to install, run the tests, or explore the puzzle format below — the test suite injects fake
 model and grading functions, so it runs offline.
 
 ## Install
 
 ```bash
-git clone https://github.com/dogfood-lab/crucible.git
-cd crucible
+git clone https://github.com/dogfood-lab/ai-crucible.git
+cd ai-crucible
 
 # Create the venv and install the dev + stats extras.
 # The `stats` extra pulls in SciPy, which the small-N scoring layer depends on.
@@ -110,9 +110,9 @@ minimal sketch with both stubbed — exactly the shape the test suite uses:
 import asyncio
 from pathlib import Path
 
-from crucible.kernel import run_attempt
-from crucible.scoring.oracle import OracleOutcome
-from crucible.types import AttemptState, FramingArm, PuzzleMeta
+from ai_crucible.kernel import run_attempt
+from ai_crucible.scoring.oracle import OracleOutcome
+from ai_crucible.types import AttemptState, FramingArm, PuzzleMeta
 
 
 async def generate(state: AttemptState) -> str:

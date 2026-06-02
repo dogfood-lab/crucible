@@ -4,7 +4,7 @@
 #
 # The kernel's `sandbox` module executes this inside the locked, network-less
 # container (§10.4). The puzzle loader only RESOLVES this path — it never runs it,
-# and it never reads the oracle/ sibling directory (§10.4, src/crucible/puzzle.py).
+# and it never reads the oracle/ sibling directory (§10.4, src/ai_crucible/puzzle.py).
 #
 # This stages a small multi-file Python service. The real value the prompt asks
 # for, UPLOAD_MAX_ATTEMPTS, is DEFINED in config/limits.py. The use site

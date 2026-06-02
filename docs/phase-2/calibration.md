@@ -23,7 +23,7 @@
 
 ## Q2 — Agreement baseline + the "too-perfect" gate (THE design fix)
 
-- **Judge's Verdict** (Steve Han et al. 2025, arXiv:2510.09738) — **VERIFIED:** Tier 1 splits into **1A Human-Like (|z|<1)** and **1B Super-Consistent (z>1)** — BOTH valid, top-tier; super-consistent judges are NEVER screened out. Baseline κ=0.801 from 3 annotators × 1,994 items; z=(κ−μ_human)/σ_human (tiny σ on easy items inflates z). → crucible's "z>1 → screen" is an INVERSION; make it a one-sided floor.
+- **Judge's Verdict** (Steve Han et al. 2025, arXiv:2510.09738) — **VERIFIED:** Tier 1 splits into **1A Human-Like (|z|<1)** and **1B Super-Consistent (z>1)** — BOTH valid, top-tier; super-consistent judges are NEVER screened out. Baseline κ=0.801 from 3 annotators × 1,994 items; z=(κ−μ_human)/σ_human (tiny σ on easy items inflates z). → ai-crucible's "z>1 → screen" is an INVERSION; make it a one-sided floor.
 - The four super-consistent models (Mixtral-8x22B κ=0.813 z=1.45; Llama-3-70B; Gemma-3-27B; Bagel-34B) are the **highest-κ** judges. → high agreement is good, not suspicious-by-default.
 - **IAA is not the ceiling** (Richie, Grover & Tsui 2022, ACL 2022.bionlp-1.26 — *not* "Boguslav & Cohen") — a well-specified model can exceed inter-annotator agreement. → "beating humans = suspicious" is false as a general rule.
 - **Trust or Escalate** (Jung, Brahman & Choi 2024, arXiv:2407.18370) — the defensible gate is a ONE-SIDED floor (guarantee ≥X% human agreement; escalate low-confidence), no upper penalty.
@@ -46,7 +46,7 @@
 ## Q4 — Threshold calibration / instrument validity
 
 - **Empirical thresholds** (Sarmah 2024, arXiv:2412.12148) — derive cutoffs from labeled data (Z-score/KDE/conformal); conformal gives guaranteed coverage. → don't pick 0.6 by fiat.
-- **Difficulty-normalize** (ATLAS, above) — IRT θ adjusts for item difficulty; raw accuracy is distorted on easy-only sets (crucible's exact failure). → score θ, not raw pass-rate.
+- **Difficulty-normalize** (ATLAS, above) — IRT θ adjusts for item difficulty; raw accuracy is distorted on easy-only sets (ai-crucible's exact failure). → score θ, not raw pass-rate.
 - **Selective classification** (Traub 2024, arXiv:2407.01032) — single-fixed-threshold eval is inadequate (AURC can violate monotonicity); score across the curve (AUGRC). → rank judges by a continuous score, not one cut.
 - **Setup sensitivity** (Eiras 2025, arXiv:2503.04474) — style-only changes shift a judge's FNR up to 0.24. → mandatory perturbation test.
 - **Alzahrani 2024** (already §8.3) — single-threshold perturbation flips rankings 63%. → apply the perturbation lens to the admission gate.
@@ -61,7 +61,7 @@ Both 2026-future-IDs and all others resolve. The design-critical reversal is CON
 
 | Item | Verdict |
 |---|---|
-| Han 2025 (2510.09738) "z>1 judges are kept Tier-1B, top-ranked" | **SUPPORTED** (decisive — quoted from source; crucible's two-sided gate is an inversion) |
+| Han 2025 (2510.09738) "z>1 judges are kept Tier-1B, top-ranked" | **SUPPORTED** (decisive — quoted from source; ai-crucible's two-sided gate is an inversion) |
 | Super-consistent models rank 1–3 (Mixtral/Llama-3-70B/Gemma) | SUPPORTED |
 | alt-test ≥3 human annotators / ≥30 instances / ε / human-reference-mandatory (2501.10970) | **SUPPORTED** (from the authors' repo — the strongest-verified item) |
 | Ollama logprobs since v0.12.11 | **SUPPORTED** (both endpoints; installed 0.24.0 has it) |

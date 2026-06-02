@@ -1,4 +1,4 @@
-"""End-to-end tests for the Crucible kernel (crucible.kernel).
+"""End-to-end tests for the Crucible kernel (ai_crucible.kernel).
 
 The kernel is the Wave-2 integrator: it composes the Wave-1 leaf modules into
 :func:`run_attempt` and :func:`run_pass_hat_k`. These tests drive the *real*
@@ -33,20 +33,20 @@ from pathlib import Path
 import anyio
 import pytest
 
-from crucible.characterize.aggregate import compose_panel
-from crucible.characterize.types import (
+from ai_crucible.characterize.aggregate import compose_panel
+from ai_crucible.characterize.types import (
     JudgeProfile,
     JudgmentRecord,
     RoleSlot,
     SeatDecision,
 )
-from crucible.engagement import SealedBoundaryViolation, build_chrome
-from crucible.kernel import run_attempt, run_pass_hat_k
-from crucible.observability import PuzzleHistory
-from crucible.puzzle import LoadedPuzzle, load_puzzle
-from crucible.scoring.judge_panel import JudgePanel
-from crucible.scoring.oracle import OracleOutcome
-from crucible.types import (
+from ai_crucible.engagement import SealedBoundaryViolation, build_chrome
+from ai_crucible.kernel import run_attempt, run_pass_hat_k
+from ai_crucible.observability import PuzzleHistory
+from ai_crucible.puzzle import LoadedPuzzle, load_puzzle
+from ai_crucible.scoring.judge_panel import JudgePanel
+from ai_crucible.scoring.oracle import OracleOutcome
+from ai_crucible.types import (
     AttemptState,
     Chrome,
     FramingArm,
@@ -95,7 +95,7 @@ def tool_using_generate(text: str, *, calls: list[tuple[str, dict]]):
     records each ``(tool, args)`` in ``calls`` through ``record_tool_call`` — the
     only legitimate accounting path (§10.2 / §8.4). Returns ``text`` after.
     """
-    from crucible.kernel import _SOLVER_HANDLE
+    from ai_crucible.kernel import _SOLVER_HANDLE
 
     async def _gen(attempt: AttemptState) -> str:
         solver = attempt.metadata[_SOLVER_HANDLE]
@@ -113,7 +113,7 @@ def looping_generate():
     pattern; the third raises ``BudgetExceeded(HARD_KILL)`` inside the governor,
     which :meth:`Solver.act` catches and stamps onto ``terminated_by``.
     """
-    from crucible.kernel import _SOLVER_HANDLE
+    from ai_crucible.kernel import _SOLVER_HANDLE
 
     async def _gen(attempt: AttemptState) -> str:
         solver = attempt.metadata[_SOLVER_HANDLE]
@@ -132,7 +132,7 @@ def tool_budget_overrun_generate(budget: int):
     ``tool_call_budget`` raises ``BudgetExceeded(BUDGET)`` inside the governor,
     which :meth:`Solver.act` catches and stamps onto ``terminated_by`` (§8.4 ANDON).
     """
-    from crucible.kernel import _SOLVER_HANDLE
+    from ai_crucible.kernel import _SOLVER_HANDLE
 
     async def _gen(attempt: AttemptState) -> str:
         solver = attempt.metadata[_SOLVER_HANDLE]
@@ -170,7 +170,7 @@ def time_overrun_generate():
     sees the overrun and raises ``BudgetExceeded(TIME)`` live (H3), which the
     Solver stamps onto ``terminated_by``.
     """
-    from crucible.kernel import _SOLVER_HANDLE
+    from ai_crucible.kernel import _SOLVER_HANDLE
 
     async def _gen(attempt: AttemptState) -> str:
         solver = attempt.metadata[_SOLVER_HANDLE]
@@ -915,10 +915,10 @@ def test_enable_critic_adds_a_critique_message(sample_dir: Path) -> None:
 def test_run_attempt_with_local_sandbox_reads_file(sample_dir: Path) -> None:
     """The kernel adapts a real LocalSandbox to the Solver's tool surface; the
     generate can read a staged file through the kernel-side governor + sandbox."""
-    from crucible.sandbox import LocalSandbox
+    from ai_crucible.sandbox import LocalSandbox
 
     loaded = load_puzzle(sample_dir)
-    from crucible.kernel import _SOLVER_HANDLE
+    from ai_crucible.kernel import _SOLVER_HANDLE
 
     seen: dict[str, str] = {}
 
@@ -957,7 +957,7 @@ def test_run_attempt_with_local_sandbox_reads_file(sample_dir: Path) -> None:
 
 def test_event_store_receives_eval_log(sample_dir: Path, tmp_path: Path) -> None:
     """When an event_store is supplied, the eval-log is appended for provenance."""
-    from crucible.attestation import JsonlEventStore
+    from ai_crucible.attestation import JsonlEventStore
 
     loaded = load_puzzle(sample_dir)
     store = JsonlEventStore(tmp_path / "trajectory.jsonl")

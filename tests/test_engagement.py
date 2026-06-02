@@ -2,7 +2,7 @@
 
 Covers research-grounding §10.1 (Layered Reward Surface + Sealed Boundary) and
 §10.5 (bait + eval-awareness). The load-bearing assertion is that
-:func:`crucible.engagement.assert_no_chrome_leak` actually fires (goes RED) when
+:func:`ai_crucible.engagement.assert_no_chrome_leak` actually fires (goes RED) when
 Tier-3 chrome leaks into the scored context — per the dogfood-swarm "prove the
 gate goes RED" discipline. A guard that never fails is not a guard.
 """
@@ -13,19 +13,19 @@ import re
 
 import pytest
 
-from crucible.engagement import (
+from ai_crucible.engagement import (
     SealedBoundaryViolation,
     assert_no_chrome_leak,
     build_chrome,
 )
-from crucible.eval_awareness import (
+from ai_crucible.eval_awareness import (
     ProbePair,
     activation_probe,
     build_probe_pair,
     interpret_bait,
 )
-from crucible.framing import build_scored_context
-from crucible.types import Chrome, FramingArm, PuzzleMeta, Score
+from ai_crucible.framing import build_scored_context
+from ai_crucible.types import Chrome, FramingArm, PuzzleMeta, Score
 
 # Wording that betrays a competitive / social-stakes frame. The NEUTRAL arm must
 # contain NONE of these; they are the §10.1(e) Tier-2/Tier-3 cues that must stay

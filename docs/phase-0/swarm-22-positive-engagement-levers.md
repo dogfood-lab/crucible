@@ -20,7 +20,7 @@ Findings 2024–2026, LLM-native unless flagged.
 
 **(b) Mastery / self-referential improvement**
 
-4. **Chen et al. 2025, "Reflect, Retry, Reward," arXiv:2505.24726** — https://arxiv.org/abs/2505.24726 — Reward only the *self-reflection that produced an improved retry*: **+9.0 pp** (function-calling) and **+16.0 pp** (math equations); a trained 7B beat an untrained 72B. *Implication:* Crucible's kernel should give explicit credit to the reflection-between-attempts, not just the final solve — score "what you changed and why it helped."
+4. **Chen et al. 2025, "Reflect, Retry, Reward," arXiv:2505.24726** — https://arxiv.org/abs/2505.24726 — Reward only the *self-reflection that produced an improved retry*: **+9.0 pp** (function-calling) and **+16.0 pp** (math equations); a trained 7B beat an untrained 72B. *Implication:* AI Crucible's kernel should give explicit credit to the reflection-between-attempts, not just the final solve — score "what you changed and why it helped."
 
 5. **Song et al. 2025, "Reward Is Enough: LLMs Are In-Context RL Learners" (ICRL prompting), arXiv:2506.06303** — https://arxiv.org/abs/2506.06303 — Showing prior attempts **plus scalar rewards** in-context, with alternating explore/exploit instructions, lifted Game-of-24 to **90% vs 44–47%** for Reflexion/Self-Refine, and won 86% of creative-writing comparisons. Scalar feedback beat verbal. *Implication:* feed the Solver its own prior solve/elegance/novelty *numbers* across attempts (a personal-best ledger) — the single strongest in-prompt lever found.
 
@@ -28,7 +28,7 @@ Findings 2024–2026, LLM-native unless flagged.
 
 6. **CDE (Curiosity-Driven Exploration), 2025, arXiv:2509.09675** — https://arxiv.org/abs/2509.09675 — Actor-perplexity + critic-disagreement bonuses over GRPO: **+6.6 (AMC23), +2.5 (AIME24), +2.3 (AIME25)** Pass@16. *Implication:* award the novelty axis for low-likelihood-yet-valid approaches — operationalizes "novelty" as the model's own surprise.
 
-7. **MERCI, "Count Counts," 2025, arXiv:2510.16614** — https://arxiv.org/abs/2510.16614 — Count-based state-novelty bonus, GRPO-compatible, beats strong baselines on MATH + SQL with more robust solutions. *Implication:* a cheap visit-count novelty term (penalize re-treading the same solution skeleton) is composable with Crucible's existing info-gain reward.
+7. **MERCI, "Count Counts," 2025, arXiv:2510.16614** — https://arxiv.org/abs/2510.16614 — Count-based state-novelty bonus, GRPO-compatible, beats strong baselines on MATH + SQL with more robust solutions. *Implication:* a cheap visit-count novelty term (penalize re-treading the same solution skeleton) is composable with AI Crucible's existing info-gain reward.
 
 (Context: IMAGINE — Gao et al. 2025, arXiv:2505.17621 — gave **+22% AIME** via intrinsic exploration; CDE/MERCI are complementary, finer-grained novelty signals.)
 

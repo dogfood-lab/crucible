@@ -20,6 +20,42 @@ wheels = [
 ]
 
 [[package]]
+name = "ai-crucible"
+version = "0.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "inspect-ai" },
+    { name = "numpy" },
+    { name = "pydantic" },
+    { name = "scipy" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+stats = [
+    { name = "statsmodels" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "inspect-ai", specifier = ">=0.3" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
+    { name = "numpy", specifier = ">=1.26" },
+    { name = "pydantic", specifier = ">=2.5" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
+    { name = "scipy", specifier = ">=1.11" },
+    { name = "statsmodels", marker = "extra == 'stats'", specifier = ">=0.14" },
+]
+provides-extras = ["stats", "dev"]
+
+[[package]]
 name = "aioboto3"
 version = "15.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -428,42 +464,6 @@ wheels = [
 toml = [
     { name = "tomli", marker = "python_full_version <= '3.11'" },
 ]
-
-[[package]]
-name = "crucible"
-version = "0.2.0"
-source = { editable = "." }
-dependencies = [
-    { name = "inspect-ai" },
-    { name = "numpy" },
-    { name = "pydantic" },
-    { name = "scipy" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-stats = [
-    { name = "statsmodels" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "inspect-ai", specifier = ">=0.3" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
-    { name = "numpy", specifier = ">=1.26" },
-    { name = "pydantic", specifier = ">=2.5" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "scipy", specifier = ">=1.11" },
-    { name = "statsmodels", marker = "extra == 'stats'", specifier = ">=0.14" },
-]
-provides-extras = ["stats", "dev"]
 
 [[package]]
 name = "debugpy"

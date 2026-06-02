@@ -1,25 +1,25 @@
 import type { SiteConfig } from '@mcptoolshop/site-theme';
 
 export const config: SiteConfig = {
-  title: 'crucible',
+  title: 'ai-crucible',
   description:
     'A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.',
   logoBadge: 'CR',
-  brandName: 'crucible',
-  repoUrl: 'https://github.com/dogfood-lab/crucible',
+  brandName: 'ai-crucible',
+  repoUrl: 'https://github.com/dogfood-lab/ai-crucible',
   footerText:
     'MIT Licensed — built by <a href="https://mcp-tool-shop.github.io/" style="color:var(--color-muted);text-decoration:underline">MCP Tool Shop</a>, part of the <a href="https://github.com/dogfood-lab" style="color:var(--color-muted);text-decoration:underline">dogfood-lab</a> workshop',
 
   hero: {
     badge: 'Diagnostic adversarial game',
-    headline: 'crucible',
+    headline: 'ai-crucible',
     headlineAccent: 'a measurement instrument that happens to be fun.',
     description:
       'One Claude session crafts puzzles targeting real, currently-observed capability gaps; another attempts them. A policy-enforced kernel scores against a hidden oracle and curates a Lab → Arena → Regression catalog — rewarding elegance and novelty, penalizing answer-bypass.',
-    primaryCta: { href: 'https://github.com/dogfood-lab/crucible', label: 'View on GitHub' },
+    primaryCta: { href: 'https://github.com/dogfood-lab/ai-crucible', label: 'View on GitHub' },
     secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
-      { label: 'Clone', code: 'git clone https://github.com/dogfood-lab/crucible' },
+      { label: 'Clone', code: 'git clone https://github.com/dogfood-lab/ai-crucible' },
       { label: 'Install', code: 'uv sync --extra dev --extra stats' },
       { label: 'Verify', code: 'bash verify.sh' },
     ],
@@ -56,7 +56,7 @@ export const config: SiteConfig = {
       title: 'Quick start',
       cards: [
         { title: 'Set up', code: 'uv sync --extra dev --extra stats' },
-        { title: 'Run the suite', code: 'uv run pytest --cov=crucible' },
+        { title: 'Run the suite', code: 'uv run pytest --cov=ai_crucible' },
         { title: 'One-command gate', code: 'bash verify.sh' },
       ],
     },

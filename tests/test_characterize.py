@@ -1,7 +1,7 @@
 """Tests for the judge-profiling harness (research-grounding §11.1 + §11.4).
 
 Covers the load-bearing behaviors the Phase-2 admission test pins, with **synthetic
-:class:`~crucible.characterize.types.JudgmentRecord`s** and — per the dogfood "prove the
+:class:`~ai_crucible.characterize.types.JudgmentRecord`s** and — per the dogfood "prove the
 gate goes RED" discipline — explicit RED proofs:
 
 * the six §11.1 metrics compute the right numbers (accuracy math, a perfect-agreement
@@ -26,7 +26,7 @@ import math
 
 import pytest
 
-from crucible.characterize.aggregate import (
+from ai_crucible.characterize.aggregate import (
     SUBMODULARITY_THRESHOLD,
     SeatedPanel,
     VerdictLike,
@@ -38,7 +38,7 @@ from crucible.characterize.aggregate import (
     reliability_weighted_vote,
     verdict_histogram,
 )
-from crucible.characterize.metrics import (
+from ai_crucible.characterize.metrics import (
     agreement,
     alt_test_omega,
     apply_temperature,
@@ -55,12 +55,12 @@ from crucible.characterize.metrics import (
     temperature_scaled_ece_cv,
     verbosity_bias,
 )
-from crucible.characterize.profile import (
+from ai_crucible.characterize.profile import (
     SeatGates,
     build_profile,
     perturbation_audit,
 )
-from crucible.characterize.types import (
+from ai_crucible.characterize.types import (
     JudgeProfile,
     JudgmentRecord,
     RoleSlot,
@@ -1077,7 +1077,7 @@ def test_cv_clamps_folds_to_item_count() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# §11.4 — panel synthesis: profiles → the seated panel crucible scores with
+# §11.4 — panel synthesis: profiles → the seated panel ai_crucible scores with
 # --------------------------------------------------------------------------- #
 
 

@@ -2,9 +2,9 @@
 
 Covers the three owned modules:
 
-- ``crucible.trace``        — TraceWriter, EvalLog shaping, attachment de-dup.
-- ``crucible.observability``— pass^k, PuzzleHistory, ModelProfile, roll_up, Wilson.
-- ``crucible.attestation``  — hash-chained JsonlEventStore (incl. the failing
+- ``ai_crucible.trace``        — TraceWriter, EvalLog shaping, attachment de-dup.
+- ``ai_crucible.observability``— pass^k, PuzzleHistory, ModelProfile, roll_up, Wilson.
+- ``ai_crucible.attestation``  — hash-chained JsonlEventStore (incl. the failing
   tamper case that proves the chain goes RED), cosign stub.
 
 The tamper test is the load-bearing one: per the dogfood-swarm "prove the gate
@@ -18,7 +18,7 @@ import json
 
 import pytest
 
-from crucible.attestation import (
+from ai_crucible.attestation import (
     GENESIS_HASH,
     HashChainError,
     JsonlEventStore,
@@ -26,19 +26,19 @@ from crucible.attestation import (
     chain_hash,
     cosign_sign_blob,
 )
-from crucible.observability import (
+from ai_crucible.observability import (
     ModelProfile,
     PuzzleHistory,
     aggregate_pass_hat_k,
     roll_up,
     wilson_interval,
 )
-from crucible.trace import (
+from ai_crucible.trace import (
     ATTACHMENT_THRESHOLD,
     TraceWriter,
     sha256_hex,
 )
-from crucible.types import AttemptState, Budget, RoleName, Score, TerminatedBy, TraceEvent
+from ai_crucible.types import AttemptState, Budget, RoleName, Score, TerminatedBy, TraceEvent
 
 # --------------------------------------------------------------------------- #
 # Helpers
@@ -159,7 +159,7 @@ def test_to_eval_log_has_expected_top_level_keys_and_a_sample() -> None:
 def test_to_eval_log_never_serializes_chrome(fresh_attempt: AttemptState) -> None:
     """Sealed boundary (§10.1(e)): Tier-3 chrome must not enter the scored
     record. The EvalLog input is the message list only; chrome is not present."""
-    from crucible.types import Chrome
+    from ai_crucible.types import Chrome
 
     fresh_attempt.chrome = Chrome(rank=1, cohort_size=12, leaderboard=[{"x": 1}])
     fresh_attempt.messages = [{"role": "user", "content": "task only"}]
@@ -350,16 +350,16 @@ def test_chain_hash_binds_prev_and_payload() -> None:
 
 def test_append_three_events_chain_verifies(tmp_path) -> None:
     store = JsonlEventStore(tmp_path / "log.jsonl")
-    h0 = store.append({"type": "crucible.puzzle.attempted.started", "seq": 0})
-    h1 = store.append({"type": "crucible.judge.evaluation.completed", "seq": 1})
-    h2 = store.append({"type": "crucible.bundle.released", "seq": 2})
+    h0 = store.append({"type": "ai_crucible.puzzle.attempted.started", "seq": 0})
+    h1 = store.append({"type": "ai_crucible.judge.evaluation.completed", "seq": 1})
+    h2 = store.append({"type": "ai_crucible.bundle.released", "seq": 2})
     assert len({h0, h1, h2}) == 3  # distinct hashes
     assert len(store) == 3
     assert store.verify_hash_chain() is True
     # Payloads round-trip with the envelope stripped.
     events = store.read_events()
     assert [e["seq"] for e in events] == [0, 1, 2]
-    assert events[0]["type"] == "crucible.puzzle.attempted.started"
+    assert events[0]["type"] == "ai_crucible.puzzle.attempted.started"
 
 
 def test_empty_store_verifies_true(tmp_path) -> None:

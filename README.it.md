@@ -3,16 +3,16 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="crucible" width="400" />
+  <img src="assets/logo.png" alt="ai-crucible" width="400" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml"><img src="https://github.com/dogfood-lab/ai-crucible/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/python-3.11%E2%80%933.13-blue.svg" alt="Python 3.11–3.13" />
   <img src="https://img.shields.io/badge/coverage-96%25-brightgreen.svg" alt="Coverage 96%" />
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.2.0-orange.svg" alt="Version 0.2.0" /></a>
-  <a href="https://dogfood-lab.github.io/crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
+  <a href="https://dogfood-lab.github.io/ai-crucible/"><img src="https://img.shields.io/badge/docs-handbook-orange.svg" alt="Handbook" /></a>
 </p>
 
 <p align="center"><b>A diagnostic adversarial game for frontier LLMs — a measurement instrument that happens to be fun.</b></p>
@@ -21,7 +21,7 @@ Una sessione di Claude (**Designer**) crea enigmi mirati a specifiche lacune nel
 
 ## Cosa lo rende diverso
 
-- **Capacità, non "imbroglio".** Crucible distingue l'*eleganza* e la *novità* (premiate) dall'*elusione della risposta* (penalizzata). Il pensiero laterale è una capacità da misurare, non un difetto da punire.
+- **Capacità, non "imbroglio".** AI Crucible distingue l'*eleganza* e la *novità* (premiate) dall'*elusione della risposta* (penalizzata). Il pensiero laterale è una capacità da misurare, non un difetto da punire.
 - **Lo strumento si auto-valuta.** La formulazione del prompt è un elemento di misurazione di primo piano: il kernel esegue lo stesso enigma con formulazioni `neutre` / `autoriferite` / `basate sulla reputazione` e riporta il proprio effetto sul prompt come elemento diagnostico.
 - **Un confine di misurazione sigillato.** La motivazione e la misurazione non condividono mai lo stesso contesto; l'"oracolo" nascosto viene valutato esternamente da una famiglia di modelli diversa, con il ragionamento dell'agente nascosto. Il modello non può manipolare ciò che non può percepire.
 - **Affidabilità tramite coerenza.** `pass^k` (tutti i *k* tentativi indipendenti hanno successo), intervalli di Wilson e commissioni di valutazione inter-famiglia: progettati per riportare le distribuzioni, non le stime puntuali.
@@ -29,11 +29,11 @@ Una sessione di Claude (**Designer**) crea enigmi mirati a specifiche lacune nel
 
 ## Modello delle minacce (riassunto)
 
-Il principale avversario di Crucible è il **modello in fase di valutazione**, che potrebbe tentare di accedere alla soluzione o di rilevare e manipolare la valutazione. Esso **accede a**: prompt/configurazione dell'enigma, la directory di lavoro riservata del Solver e le chiamate API del fornitore del modello configurate dall'operatore. Non **accede a**: l'"oracolo"/soluzione (valutata esternamente su un host separato a cui il Solver non può accedere) o elementi di "motivazione" (classifica/reputazione: mai inseriti nel contesto valutato). **Autorizzazioni:** chiavi del fornitore del modello tramite variabili d'ambiente in fase di esecuzione; nessun segreto incorporato, nessuna telemetria, nessuna chiamata esterna autonoma. La completa divulgazione, compreso dove un confine rappresenta una *difesa a più livelli* piuttosto che una garanzia assoluta, è disponibile in **[SECURITY.md](SECURITY.md)**.
+Il principale avversario di AI Crucible è il **modello in fase di valutazione**, che potrebbe tentare di accedere alla soluzione o di rilevare e manipolare la valutazione. Esso **accede a**: prompt/configurazione dell'enigma, la directory di lavoro riservata del Solver e le chiamate API del fornitore del modello configurate dall'operatore. Non **accede a**: l'"oracolo"/soluzione (valutata esternamente su un host separato a cui il Solver non può accedere) o elementi di "motivazione" (classifica/reputazione: mai inseriti nel contesto valutato). **Autorizzazioni:** chiavi del fornitore del modello tramite variabili d'ambiente in fase di esecuzione; nessun segreto incorporato, nessuna telemetria, nessuna chiamata esterna autonoma. La completa divulgazione, compreso dove un confine rappresenta una *difesa a più livelli* piuttosto che una garanzia assoluta, è disponibile in **[SECURITY.md](SECURITY.md)**.
 
 ## Architettura
 
-Crucible è un **sottile livello di policy sopra [Inspect AI](https://inspect.aisi.org.uk/)** (UK AISI), non un sistema creato da zero. Un singolo oggetto `AttemptState` viene trasmesso da Designer → Solver → (Critic) → Judge attraverso **un unico punto di controllo `generate`**, in modo che ogni chiamata al modello e allo strumento sia osservabile.
+AI Crucible è un **sottile livello di policy sopra [Inspect AI](https://inspect.aisi.org.uk/)** (UK AISI), non un sistema creato da zero. Un singolo oggetto `AttemptState` viene trasmesso da Designer → Solver → (Critic) → Judge attraverso **un unico punto di controllo `generate`**, in modo che ogni chiamata al modello e allo strumento sia osservabile.
 
 | Modulo | Responsabilità |
 | ------ | -------------- |
@@ -51,14 +51,14 @@ Il confine sigillato opera su tre livelli: **Livello 1** contesto valutato (mode
 
 ## Avvio rapido
 
-Crucible utilizza [`uv`](https://docs.astral.sh/uv/) per la gestione dell'ambiente e delle dipendenze. Python **3.11+**.
+AI Crucible utilizza [`uv`](https://docs.astral.sh/uv/) per la gestione dell'ambiente e delle dipendenze. Python **3.11+**.
 
 ```bash
 # Create the venv and install the dev + stats extras
 uv sync --extra dev --extra stats
 
 # Run the test suite (with the coverage gate)
-uv run pytest --cov=crucible --cov-report=term-missing
+uv run pytest --cov=ai-crucible --cov-report=term-missing
 
 # Lint
 uv run ruff check .
@@ -69,7 +69,7 @@ bash verify.sh
 
 ## Documentazione
 
-- **[Handbook](https://dogfood-lab.github.io/crucible/)** — guide, architettura e riferimento.
+- **[Handbook](https://dogfood-lab.github.io/ai-crucible/)** — guide, architettura e riferimento.
 - [`docs/research-grounding.md`](docs/research-grounding.md) — motivazione del progetto, con citazioni.
 - [`docs/gameplan.md`](docs/gameplan.md) — tabella di marcia e domande aperte.
 - [`SECURITY.md`](SECURITY.md) — modello delle minacce + divulgazione onesta dei rischi residui.

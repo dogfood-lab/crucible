@@ -24,8 +24,8 @@ from collections.abc import Awaitable, Callable
 
 import pytest
 
-from crucible.characterize.aggregate import SeatedJudge, SeatedPanel
-from crucible.scoring import (
+from ai_crucible.characterize.aggregate import SeatedJudge, SeatedPanel
+from ai_crucible.scoring import (
     CRITICAL_FLAVOR,
     JudgePanel,
     OracleOutcome,
@@ -39,7 +39,7 @@ from crucible.scoring import (
     weighted_judge,
     wilson_interval,
 )
-from crucible.types import (
+from ai_crucible.types import (
     AttemptState,
     GoodhartFlavor,
     Penalty,

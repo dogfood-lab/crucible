@@ -7,7 +7,7 @@ sidebar:
 
 This page covers the vocabulary the rest of the handbook assumes: who plays, how puzzles move through
 the catalog, how reliability is measured, when a puzzle is "real," how an attempt is scored, and how
-crucible measures its own prompt sensitivity.
+ai-crucible measures its own prompt sensitivity.
 
 ## The five roles
 
@@ -46,20 +46,20 @@ still fails on" Lab cycle, so the catalog stays ahead of the frontier by constru
 
 ## Reliability: `pass^k`, not `pass@k`
 
-Crucible reports **consistency**, not best-of-`k`. `pass^k` is the probability that *all* `k`
+AI Crucible reports **consistency**, not best-of-`k`. `pass^k` is the probability that *all* `k`
 independent trials succeed — it decays exponentially and exposes unreliability that `pass@k` (which
 rewards a single lucky success out of `k`) hides. This matters because frontier failures are sticky:
 a large fraction of a model's failures on agentic tasks recur identically across re-runs, so a metric
 that hides that recurrence overstates real-world reliability.
 
-Crucible records `pass^k` *natively* — `k` sibling attempts collected under one puzzle history, rather
+AI Crucible records `pass^k` *natively* — `k` sibling attempts collected under one puzzle history, rather
 than `k` samples folded into one log — so the consistency view is first-class.
 
 ### Wilson intervals at small N
 
-Crucible grades a handful of attempts per puzzle, never hundreds. At that scale the classical
+AI Crucible grades a handful of attempts per puzzle, never hundreds. At that scale the classical
 normal-approximation (Wald) confidence interval is inadmissible — it under-states uncertainty and
-degenerates at the 0-of-N and N-of-N boundaries. Crucible uses the **Wilson score interval** (and the
+degenerates at the 0-of-N and N-of-N boundaries. AI Crucible uses the **Wilson score interval** (and the
 conservative **Clopper–Pearson exact** interval when it must not understate uncertainty), both of
 which stay sane and informative at small N and never escape `[0, 1]`.
 
@@ -84,7 +84,7 @@ the normal interval breaks down.
 ## The scoring gate: conjunctive, with a tiebreaker
 
 A weighted sum of "solve + elegance + novelty − penalties" is Goodhart-fragile: a capable agent can
-trade a little true performance for a lot of proxy reward. So crucible separates the **pass/fail
+trade a little true performance for a lot of proxy reward. So ai-crucible separates the **pass/fail
 decision** from the **ranking number**.
 
 The **hard gate is a conjunction** — it opens only when *all* of these hold:
@@ -109,8 +109,8 @@ the score metadata, so a failure is legible rather than a bare zero.
 
 ## Framing as a measured arm
 
-Prompt framing is not a fixed choice in crucible — it is a **first-class measured variable**. The same
-puzzle can be run under three arms, and crucible characterizes its *own* prompt-effect as a built-in
+Prompt framing is not a fixed choice in ai-crucible — it is a **first-class measured variable**. The same
+puzzle can be run under three arms, and ai-crucible characterizes its *own* prompt-effect as a built-in
 diagnostic:
 
 - **`neutral`** — the task and legitimate task feedback only.

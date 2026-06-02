@@ -1,8 +1,8 @@
-# Attestia Integration Roadmap — Crucible's Audit Chain Backbone
+# Attestia Integration Roadmap — AI Crucible's Audit Chain Backbone
 
 **Status:** Planned future dogfood swarm. Not yet executed.
 **Target repo:** [`mcp-tool-shop-org/Attestia`](https://github.com/mcp-tool-shop-org/Attestia)
-**Consumer:** crucible (and downstream eval projects)
+**Consumer:** ai-crucible (and downstream eval projects)
 **Date drafted:** 2026-05-27
 
 ---
@@ -11,9 +11,9 @@
 
 Attestia is `mcp-tool-shop-org`'s "financial truth infrastructure for the decentralized world" — append-only event persistence, hash-chained, XRPL-attested, with structural governance via the Registrum component. Its core primitives are domain-neutral; its current event types and surrounding packages are finance-domain (Personal Vault, Org Treasury, Registrum).
 
-Crucible needs exactly the same primitives (append-only with tamper-evident chain, schema-versioned events, multi-channel attestation) applied to eval-domain artifacts (puzzle attempts, judge evaluations, panel votes, rubric bundles, calibration runs). Rather than build a parallel transparent log from scratch, we extend Attestia into a general-purpose audit-chain framework that serves finance, eval, and other future domains.
+AI Crucible needs exactly the same primitives (append-only with tamper-evident chain, schema-versioned events, multi-channel attestation) applied to eval-domain artifacts (puzzle attempts, judge evaluations, panel votes, rubric bundles, calibration runs). Rather than build a parallel transparent log from scratch, we extend Attestia into a general-purpose audit-chain framework that serves finance, eval, and other future domains.
 
-The dogfood swarm plans the extension work needed on Attestia to bring it in line with crucible's audit-chain needs.
+The dogfood swarm plans the extension work needed on Attestia to bring it in line with ai-crucible's audit-chain needs.
 
 ---
 
@@ -32,16 +32,16 @@ Architecture follows `Intent → Approve → Execute → Verify`. License MIT.
 
 ---
 
-## What crucible needs Attestia to add
+## What ai-crucible needs Attestia to add
 
-1. **Eval-domain event types** registered via `EventCatalog` — `crucible.puzzle.*`, `crucible.judge.*`, `crucible.panel.*`, `crucible.bundle.*`, `crucible.tuning.*`, `crucible.preregistration.*`.
+1. **Eval-domain event types** registered via `EventCatalog` — `ai_crucible.puzzle.*`, `ai_crucible.judge.*`, `ai_crucible.panel.*`, `ai_crucible.bundle.*`, `ai_crucible.tuning.*`, `ai_crucible.preregistration.*`.
 2. **ML supply-chain bridges** — in-toto v1 envelope generation, RFC 3161 TSA client, Sigstore/Rekor integration with `cosign sign-blob`.
 3. **Multi-channel attestation orchestration** — XRPL (existing) + Sigstore (new) + RFC 3161 (new), with policy (all/any/majority) and verification of all channels.
 4. **Inspect AI integration** — bridge so frontier-eval task runs (UK AISI's Inspect framework) emit Attestia events natively.
 5. **Public verification SDK** — given a bundle hash, walk the event chain and produce a tamper-evidence report.
 6. **Statistical reporting layer** — pass^k computation, Wilson / Clopper-Pearson / Bayesian intervals (via `bayes_evals`), McNemar's exact test, BH-FDR and Westfall-Young correction, all operating on event streams.
 
-The first three are necessary for crucible's §9 audit chain to land. The last three are integration polish that makes crucible-on-Attestia trivial to use from external auditor tooling.
+The first three are necessary for ai-crucible's §9 audit chain to land. The last three are integration polish that makes crucible-on-Attestia trivial to use from external auditor tooling.
 
 ---
 
@@ -64,19 +64,19 @@ Three parallel agents on current Attestia codebase:
 Extend `EventCatalog` with crucible-aware event types:
 
 ```typescript
-'crucible.puzzle.published'              // designer commits a new puzzle to Lab
-'crucible.puzzle.attempted.started'      // solver begins attempt
-'crucible.puzzle.attempted.completed'    // solver submits solution
-'crucible.judge.evaluation.requested'    // kernel asks panel to score
-'crucible.judge.evaluation.completed'    // panel returns verdict
-'crucible.panel.vote.cast'               // individual judge vote
-'crucible.panel.consensus.reached'       // panel-level decision
-'crucible.bundle.compiled'               // tuning produces new rubric.bundle
-'crucible.bundle.released'               // bundle promoted to active
-'crucible.tuning.iteration.completed'    // BO step finishes
-'crucible.tuning.frozen'                 // tuning protocol completes
-'crucible.preregistration.filed'         // AsPredicted URL recorded
-'crucible.regression.demoted'            // saturated puzzle archived
+'ai_crucible.puzzle.published'              // designer commits a new puzzle to Lab
+'ai_crucible.puzzle.attempted.started'      // solver begins attempt
+'ai_crucible.puzzle.attempted.completed'    // solver submits solution
+'ai_crucible.judge.evaluation.requested'    // kernel asks panel to score
+'ai_crucible.judge.evaluation.completed'    // panel returns verdict
+'ai_crucible.panel.vote.cast'               // individual judge vote
+'ai_crucible.panel.consensus.reached'       // panel-level decision
+'ai_crucible.bundle.compiled'               // tuning produces new rubric.bundle
+'ai_crucible.bundle.released'               // bundle promoted to active
+'ai_crucible.tuning.iteration.completed'    // BO step finishes
+'ai_crucible.tuning.frozen'                 // tuning protocol completes
+'ai_crucible.preregistration.filed'         // AsPredicted URL recorded
+'ai_crucible.regression.demoted'            // saturated puzzle archived
 ```
 
 Each event:
@@ -85,7 +85,7 @@ Each event:
 - Round-trip serialization tests
 - Migration path declarations
 
-**Output:** new event types registered, schema files in `packages/event-store/src/schemas/crucible/`, tests, migration docs.
+**Output:** new event types registered, schema files in `packages/event-store/src/schemas/ai-crucible/`, tests, migration docs.
 
 ### Phase 3 — In-toto v1 bridge
 
@@ -166,7 +166,7 @@ Given a bundle hash, walks the event chain end-to-end:
 
 **New package:** `@attestia/eval-stats`
 
-Wraps event streams in statistical analysis primitives matching crucible's §9.3 statistical stack:
+Wraps event streams in statistical analysis primitives matching ai-crucible's §9.3 statistical stack:
 - pass^k computation from event sequences
 - Wilson / Clopper-Pearson / Bayesian beta-binomial intervals (delegated to `bayes_evals`)
 - McNemar's exact test for paired model comparison
@@ -213,16 +213,16 @@ Estimated total cost: 1 dogfood-swarm session (10 phases, parallel where possibl
 
 ---
 
-## Crucible dependency
+## AI Crucible dependency
 
-Crucible's Phase 1 instrument-quality scaffolding currently lists "transparent log via `@attestia/event-store`" as a deliverable. With this roadmap completed, Crucible's Phase 4 (architectural lock + first diagnostic cycle) depends on:
+AI Crucible's Phase 1 instrument-quality scaffolding currently lists "transparent log via `@attestia/event-store`" as a deliverable. With this roadmap completed, AI Crucible's Phase 4 (architectural lock + first diagnostic cycle) depends on:
 
 - **Attestia Phase 2** (eval event schemas) — required before kernel emits events
 - **Attestia Phase 3-5** (in-toto + RFC 3161 + Sigstore) — required for §9.5 release stamping
 - **Attestia Phase 6** (multi-channel witness) — required for full defense-in-depth attestation
 - **Attestia Phase 8** (verify-public) — required for inviting external auditors per §9.6
 
-**Attestia Phase 7 (Inspect bridge) and Phase 9 (eval-stats) are nice-to-have for Crucible Phase 4 but not blocking** — Crucible can produce its first audit-ready diagnostic cycle without them, then adopt as they ship.
+**Attestia Phase 7 (Inspect bridge) and Phase 9 (eval-stats) are nice-to-have for AI Crucible Phase 4 but not blocking** — AI Crucible can produce its first audit-ready diagnostic cycle without them, then adopt as they ship.
 
 ---
 
@@ -230,7 +230,7 @@ Crucible's Phase 1 instrument-quality scaffolding currently lists "transparent l
 
 - **Replacing Attestia's financial-domain packages** — Personal Vault, Org Treasury, Registrum's 11 finance invariants stay as-is. The eval-domain extensions live alongside them, not instead of them. Attestia becomes multi-domain, not eval-only.
 - **Migrating away from XRPL** — XRPL remains the primary witness channel. Sigstore + RFC 3161 are added as additional independent channels for defense in depth.
-- **Building crucible-specific tooling inside Attestia** — Crucible stays the consumer; Attestia provides domain-neutral primitives once eval event types are registered. Crucible's puzzle catalog, kernel mediation, judge orchestration, and scoring logic stay in `dogfood-lab/crucible`.
+- **Building crucible-specific tooling inside Attestia** — AI Crucible stays the consumer; Attestia provides domain-neutral primitives once eval event types are registered. AI Crucible's puzzle catalog, kernel mediation, judge orchestration, and scoring logic stay in `dogfood-lab/ai-crucible`.
 - **Cross-domain reconciliation** — Attestia has a `@attestia/reconciler` for financial cross-system reconciliation. Whether eval reconciliation (e.g., judge panel cross-validation against external benchmarks) belongs in `@attestia/reconciler` or in a separate package is a Phase 2 design decision.
 
 ---
@@ -241,7 +241,7 @@ To resolve during Phase 1-2:
 
 1. **Are there current finance-coupling assumptions in core packages that need refactoring?** Phase 1b proactive pass surfaces this.
 2. **Does `@attestia/registrum`'s 11-invariant pattern transfer to eval domain, or does eval need its own invariant set?** Phase 2 design decision.
-3. **Should `crucible.*` event types live in `@attestia/event-store` core, or in a separate `@attestia/eval-schemas` package?** Architectural call during Phase 2.
+3. **Should `ai-crucible.*` event types live in `@attestia/event-store` core, or in a separate `@attestia/eval-schemas` package?** Architectural call during Phase 2.
 4. **Is `@attestia/reconciler` reusable for cross-family panel reconciliation, or is that crucible-specific?** Phase 1-2 evaluation.
 5. **What's the right policy default for multi-channel witness in eval contexts — `all` (strictest), `majority` (resilient), or `any` (most permissive)?** Phase 6 calibration, informed by §9 design.
 
@@ -251,4 +251,4 @@ To resolve during Phase 1-2:
 
 When ready to execute: invoke the `dogfood-swarm` skill against `mcp-tool-shop-org/Attestia` with this roadmap as the scope document. The swarm will run the 10-phase plan, producing PRs against Attestia main and (in Phase 10) a tagged release with all new packages live on npm.
 
-Crucible's Phase 4 diagnostic-cycle work can begin in parallel against current Attestia (`@attestia/event-store` as it stands today) using stub adapters for the not-yet-existing in-toto / RFC 3161 / Sigstore bridges. Those stubs get replaced as Phases 3-5 ship.
+AI Crucible's Phase 4 diagnostic-cycle work can begin in parallel against current Attestia (`@attestia/event-store` as it stands today) using stub adapters for the not-yet-existing in-toto / RFC 3161 / Sigstore bridges. Those stubs get replaced as Phases 3-5 ship.
