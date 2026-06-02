@@ -842,3 +842,55 @@ benefit-of-doubt and DISPUTED items escalated/dropped rather than forced. EXTERN
 Fork C's entire purpose is replacing the same-population model jury with an independent human
 reference; its own citations were retrieval-oracle-verified, and a different agent runs the
 composed re-audit.
+
+### 12.3 Fork B — the committed panel artifact, re-run on the expanded set (2026-06-02)
+
+The "next pilot" §12.1 called for is done: the characterization re-ran on the **Fork-A-expanded
+93-item set** (6 cross-family models × 93 items × k=3 = 1674 judgments, ~2.6 h sequential
+load→judge→evict on the RTX 5090 — qwen3.6 ~80 min + gemma4 ~60 min dominated, the thinking
+models). The seated panel is committed as `docs/phase-2/panel.json` (the canonical instrument
+config crucible scores with); the raw report is gitignored. Reproduce: `OLLAMA_NUM_PARALLEL=1
+OLLAMA_MAX_LOADED_MODELS=1 uv run python -m crucible.characterize.run --k 3 --write-panel
+docs/phase-2/panel.json`.
+
+| model | acc | decision | quality | ECE raw → cv | ω (jury) |
+|---|---|---|---|---|---|
+| gemma4:31b | 1.00 | **seat [review]** | 1.000 | 0.000 → 0.000 | 0.80 |
+| granite4.1:30b | 0.96 | **seat [review]** | 0.954 | 0.045 → 0.018 | 1.00 |
+| qwen3.6:27b | 0.985 | **screen [review]** | 0.986 | 0.150 → 0.057 | 0.40 |
+| devstral-small-2:24b | 0.87 | reject | 0.851 | 0.048 → 0.046 | 0.40 |
+| mistral-small:24b | 0.87 | reject | 0.857 | 0.048 → 0.050 | 0.20 |
+| aya-expanse:32b | 0.77 | reject | 0.751 | 0.157 → 0.081 | 0.00 |
+
+**What the re-run proves (the de-saturation worked, and it bites):**
+
+- **The discriminating set nearly doubled: IRT keeps 28 / 93** (vs 15 / 51 before). The Fork-A
+  hard tail survives the ATLAS prune — the >15 success criterion is met with margin.
+- **The panel went 3 seats → 2, and qwen3.6 dropped SEAT → SCREEN.** On the easy 51-item set
+  qwen sat at acc 1.00; on the de-saturated set it is acc 0.985 but its model-jury ω=0.4 (<0.5)
+  screens it. gemma4 (still 1.00) and granite4.1 (0.96, ω=1.0) hold their seats; the bottom
+  three reject as before. A strong judge falling off the 100% ceiling is the instrument working,
+  not a regression.
+- **Two seats is SUB-QUORUM (PoLL ≥3), so `panel_composition` escalates to the Claude Designer**
+  (`escalate: true`, `meets_quorum: false`) rather than seating a thin 2-judge panel. This is an
+  honest, load-bearing finding: on the harder set, **only 2 of 6 local models clear the bar**, so
+  the committed `panel.json` is a *2-seat escalating* config, not a self-sufficient quorum. The
+  fix is more seat-worthy local models (or a harder-but-fair set that still admits ≥3), not
+  lowering the gate.
+- **ECE is now held-out everywhere** (the §12 Q3 section is populated): temperature scaling buys
+  real out-of-sample calibration — qwen 0.150→0.057, aya 0.157→0.081, granite 0.045→0.018; gemma
+  is already ≈0 (T=1.0, "no calibration learned"). These are the `ece_cv` k-fold numbers, not the
+  optimistic in-sample ones.
+
+**Honest findings (carry forward):**
+
+- **ω here is STILL the circular model-jury bootstrap** (`alt_test_reference:
+  "model-jury-bootstrap"`, the loud caveat intact). qwen's SCREEN is therefore partly an artifact
+  of the circular ω (it agrees with its peers less than they agree with each other), **not** a
+  human-validated substitution failure. Fork C built the harness that ends this; until a real
+  human-labeling round feeds `--human-labels`, the seats remain provisional exactly as stated.
+  The re-run is the strongest argument yet for that round — the seat/screen line for qwen now
+  *turns on* the very ω the human alt-test makes non-circular.
+- **gemma4 is still 1.00 on the harder set** — either a genuinely excellent judge or a sign the
+  tail still does not challenge gemma specifically; a future even-harder slice (or an item-level
+  IRT difficulty fit once py-irt is wired) could probe which.
