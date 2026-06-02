@@ -348,8 +348,11 @@ def test_admission_pairs_load_via_loader() -> None:
     """The pair-set round-trips through the existing loader into CalibrationItems."""
     items = load_items(ADMISSION_PAIRS)
     assert all(isinstance(it, CalibrationItem) for it in items)
-    # §12: 40–60 plausible-vs-subtly-wrong pairs (replaces the saturating 20-item set).
-    assert 40 <= len(items) <= 60
+    # §12: plausible-vs-subtly-wrong pairs (replaces the saturating 20-item set). The
+    # Fork-A expansion (Phase-2 swarm, 2026-06) grew the base 51 by 42 NON-arithmetic
+    # discriminators across 6 new construct domains — the set saturated at the top for
+    # strong judges (IRT kept only 15/51), so more medium/hard items with a real tail.
+    assert 80 <= len(items) <= 150
     assert len({it.id for it in items}) == len(items), "pair ids must be unique"
 
 
