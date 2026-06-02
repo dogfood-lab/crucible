@@ -6,6 +6,8 @@
 
 **Trigger — the first characterization run self-diagnosed.** 6 local models × the 20-item set × k=3 produced: qwen3.6:27b / gemma4:31b / granite4.1:30b each **acc=1.00** (the set SATURATES — no discrimination at the top); the κ-z gate flagged those three as "supra-human → SCREEN" (z=+2.24 vs an assumed human-human κ=0.80) and **seated only devstral-small-2:24b** (κ=0.80, z=0). Known-groups passed (all nailed the 8 trivial anchors → instrument valid). alt-test ω + ECE could not run (single gold; no confidence). The panel ρ-correlation step errored (glue shape bug).
 
+**Outcome (the corrected run, 2026-06-01).** The redesign was built and re-run on a 51-item pair set; under the one-sided gate the three κ≈1.0 models (qwen3.6:27b, gemma4:31b, granite4.1:30b) now **SEAT** (Tier-1B, review-flagged) and the old sole-seat devstral now **rejects** — the set discriminates, ECE is measured via logprob, and ρ/known-groups/IRT-prune/perturbation all produce real numbers. Full receipt + the three integration bugs the live run caught: [`research-grounding.md` §12.1](../research-grounding.md). (The earlier "known-groups passed" above was *vacuous* — records carried a prompt-hash id, not the authored id; fixed.)
+
 ---
 
 ## Q1 — Discriminating items (the set saturates)

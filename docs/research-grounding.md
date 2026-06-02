@@ -705,3 +705,31 @@ The first real characterization run (6 local models × 20 items × k=3) **self-d
 - **Replace the brittle 7-threshold binary gate** with a **difficulty-normalized continuous judge-quality score** + a **selective (CI-based) seat/screen/reject** decision + a **perturbation audit** (jitter each threshold ±1 SE, report the decision-flip rate — the §8.3 Alzahrani lens applied to admission). Set thresholds empirically (Sarmah 2024, arXiv:2412.12148), score across the operating curve not at one cut (Traub 2024, arXiv:2407.01032), and expect setup-sensitivity (Eiras 2025, arXiv:2503.04474 — style shifts a judge's FNR up to 0.24).
 
 These **supersede §11.1's gate** (now one-sided + difficulty-normalized) and **§11.3's set** (now discriminating pairs + IRT prune). Implementation: correct `characterize/profile.py`'s κ-z gate to one-sided; re-scoring the first run under it seats the three κ=1.0 models. All cited IDs resolve; corrections from the verification pass are recorded in `phase-2/calibration.md`.
+
+### 12.1 Implementation receipts — the corrected run (2026-06-01)
+
+The redesign is built and run. Panel: 6 cross-family local models × the 51-item `admission_pairs.json` set × k=3 (918 judgments), sequential load→judge→evict on the RTX 5090. Commits `9d02230` (redesign) + `d0b0b2b` (logprob fix) on `phase-2`. Raw report is a run artifact (gitignored); headline numbers below are the committed receipt. Reproduce: `OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 uv run python -m crucible.characterize.run --k 3`.
+
+| model | acc | κ | decision | quality | ECE (logprob) | ω (jury) |
+|---|---|---|---|---|---|---|
+| qwen3.6:27b | 1.00 | 1.00 | **seat [review]** | 1.00 | 0.121 | 0.80 |
+| gemma4:31b | 1.00 | 1.00 | **seat [review]** | 1.00 | ~0.000 | 0.80 |
+| granite4.1:30b | 0.98 | 0.96 | **seat [review]** | 0.978 | 0.019 | 1.00 |
+| mistral-small:24b | 0.86 | 0.73 | reject | 0.857 | 0.053 | 0.20 |
+| devstral-small-2:24b | 0.84 | 0.69 | reject | 0.836 | 0.111 | 0.40 |
+| aya-expanse:32b | 0.84 | 0.69 | reject | 0.826 | 0.118 | 0.00 |
+
+**What the corrected run proves:**
+
+- **The gate fix is vindicated on the full panel.** The three κ≈1.0 models the *inverted* gate screened (qwen, gemma, granite) now **seat as Tier-1B** (review-flagged, not screened). The old run's *sole* seat — devstral (κ=0.80 on the easy set) — now **rejects** on the discriminating set (acc 0.84). The easy set AND the inverted gate were each wrong; together they had it exactly backwards.
+- **The set discriminates.** Clean top-3 (≥0.98) vs bottom-3 (≤0.86) separation — no saturation at the decision boundary (the failure §12 set out to fix).
+- **ECE is now measured** (the metric the first run couldn't compute): gemma ≈0 (essentially perfectly calibrated), granite 0.019, the rest 0.05–0.12 — all via the verdict-token logprob, no verbalized confidence.
+- **ρ-submodularity runs** (15 pairs, 0.00–0.54). The seated trio is mutually submodular (perfect judges → zero error-variance → ρ=0); every high-ρ pair is among the *rejected* weak models, which fail the same hard items (devstral|mistral ρ=0.54). `submodular:false` is driven by models that won't seat.
+- **known-groups is no longer vacuous.** It now catches real trivial-anchor misses — mistral (`pair-03-mult`, `pair-05-div`) and devstral (`pair-02-rev`); the seated trio has zero. This is a *model* signal, not an instrument fault.
+- **Perturbation audit:** every seat decision is robust to ±1 SE threshold jitter (flip_rate 0.0); max 0.0625 (one reject, mistral, flips once near a threshold) — the andon signal is green.
+
+**Honest findings (carry forward, §11.7 director decisions):**
+
+- **alt-test ω is the circular model-jury bootstrap** (documented in the report's `alt_test_caveat`). The seated trio's high ω (0.80–1.00) partly reflects agreement with the panel majority they dominate, **not** human-validated substitution. Human labels (≥3 annotators, ≥30 items) remain required before ω gates for real.
+- **IRT prune kept 15 / dropped 36** (saturated trivia like `pair-00-add` + low point-biserial). A 70% drop means the *effective discriminating set for this panel is ~15 items* — below the §12 target. **Next pilot: author more hard items** (the 15 survivors are the seed) and re-prune.
+- **Three integration bugs were caught by the real run**, not the unit suite: (1) the panel-ρ glue passed the wrong shape (`'str' has no attribute 'predicted'`); (2) `judge_item` stamped a *prompt-hash* `item_id`, making the first run's known-groups "pass" vacuous; (3) logprobs sent under `options` are silently ignored by Ollama 0.24.0 — they must be **top-level**, so ECE was dead despite the wiring. All three fixed + regression-tested. EXTERNAL_VERIFIER and the live run earned their keep.

@@ -436,7 +436,8 @@ class OllamaModel:
         consistency and ``position`` drives position-swap bias (§11.1 metrics 4 and 6).
 
         Confidence (§12, the metric the first run couldn't compute): the request pins
-        ``logprobs``/``top_logprobs`` (:meth:`_options`); the **first generated token** is
+        ``logprobs``/``top_logprobs`` (:meth:`_logprob_request`, top-level); the **first
+        generated token** is
         the verdict (``A``/``B`` / ``PASS``/``FAIL``), so ``exp`` of its logprob is the
         model's probability mass on the verdict it chose — a calibrated confidence for
         ECE. Per §12 this is the verdict-token logprob, **not** a verbalized number. If
