@@ -324,9 +324,12 @@ def test_judge_item_confidence_from_native_logprob() -> None:
     assert record.confidence is not None
     assert record.confidence == pytest.approx(math.exp(-0.105360516))
     assert record.confidence == pytest.approx(0.9, abs=1e-3)
-    # the request actually asked for logprobs (PIN_PER_STEP — pinned in the options).
-    assert client.calls[0]["options"]["logprobs"] is True
-    assert client.calls[0]["options"]["top_logprobs"] == 1
+    # the request actually asked for logprobs (PIN_PER_STEP). Ollama 0.24.0 honours
+    # these only at the request TOP LEVEL, not nested under options — so that is where
+    # the adapter sends them, and what we assert (the live-server contract).
+    assert client.calls[0]["logprobs"] is True
+    assert client.calls[0]["top_logprobs"] == 1
+    assert "logprobs" not in client.calls[0]["options"]
 
 
 def test_judge_item_confidence_from_nested_logprob() -> None:

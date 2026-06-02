@@ -225,24 +225,39 @@ class OllamaModel:
     # -- deterministic request options (§11.2) ------------------------------- #
 
     def _options(self) -> dict[str, Any]:
-        """The pinned deterministic sampling options sent on every request (§11.2).
+        """The pinned deterministic *sampling* options sent on every request (§11.2).
 
-        ``temperature=0`` (greedy) + a fixed ``seed`` + a fixed ``num_ctx``, plus the
-        per-token logprob request (``logprobs``/``top_logprobs``) Ollama honours since
-        v0.12.11 — :meth:`judge_item` reads the verdict-token logprob off the response
-        to set :attr:`JudgmentRecord.confidence` (§12). Kept in one place so the request
-        path and the recorded ``metadata`` cannot drift — :meth:`judge_item` stores
-        exactly this dict, making the call replayable (PIN_PER_STEP). Requesting logprobs
-        on every call is harmless to the text-only paths (:meth:`generate`/:meth:`judge`
-        ignore them) and keeps one pinned option set.
+        ``temperature=0`` (greedy) + a fixed ``seed`` + a fixed ``num_ctx``. Kept in one
+        place so the request path and the recorded ``metadata`` cannot drift —
+        :meth:`pin_metadata` stores exactly this dict, making the call replayable
+        (PIN_PER_STEP).
+
+        Per-token logprobs are requested **separately**, as TOP-LEVEL request fields
+        (:meth:`_logprob_request`), NOT here: Ollama 0.24.0 honours
+        ``logprobs``/``top_logprobs`` only at the top level of the chat request and
+        silently ignores them when nested under ``options`` (verified against the live
+        server — nesting them here returned no logprob channel, so confidence/ECE could
+        not be computed). :meth:`judge_item` reads the verdict-token logprob off the
+        response to set :attr:`JudgmentRecord.confidence` (§12).
         """
         return {
             "temperature": 0,
             "seed": self.seed,
             "num_ctx": self.num_ctx,
-            "logprobs": True,
-            "top_logprobs": 1,
         }
+
+    @staticmethod
+    def _logprob_request() -> dict[str, Any]:
+        """The TOP-LEVEL per-token logprob request fields (§12).
+
+        Ollama 0.24.0 returns per-token ``logprobs`` (native ``/api/chat``) /
+        ``top_logprobs`` (OpenAI-compatible) only when these sit at the **request top
+        level**, not inside ``options`` — so they are sent as their own kwargs in
+        :meth:`_complete_raw` and recorded in :meth:`pin_metadata`. Requesting them on
+        every call is harmless to the text-only paths (:meth:`generate`/:meth:`judge`
+        ignore the channel).
+        """
+        return {"logprobs": True, "top_logprobs": 1}
 
     def pin_metadata(self) -> dict[str, Any]:
         """The PIN_PER_STEP provenance block stamped on characterization records.
@@ -256,6 +271,7 @@ class OllamaModel:
             "family": self.family,
             "quant": self.quant,
             "options": self._options(),
+            "logprobs": self._logprob_request(),
             "serving": "OLLAMA_NUM_PARALLEL=1; load->judge->evict (§11.2)",
         }
 
@@ -317,6 +333,7 @@ class OllamaModel:
             model=self.model_id,
             messages=messages,
             options=self._options(),
+            **self._logprob_request(),
         )
 
     async def complete(self, messages: list[dict[str, Any]]) -> str:
