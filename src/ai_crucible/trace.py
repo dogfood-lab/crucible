@@ -165,7 +165,7 @@ class TraceWriter:
         The returned dict has the documented top-level keys ``eval`` / ``plan``
         / ``results`` / ``stats`` / ``samples`` plus an ``attachments`` map. The
         single sample carries ``id, input, target, output, scores, events,
-        metadata, error`` — Crucible runs one attempt per record (pass^k is k
+        metadata, error`` — AI Crucible runs one attempt per record (pass^k is k
         *sibling* records, not k samples in one log, per finding 6, handled by
         :mod:`ai_crucible.observability`).
 

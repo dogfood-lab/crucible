@@ -1,6 +1,6 @@
 """Eval-awareness probe + bait interpretation (§10.5).
 
-Crucible's primary behavioral signal for answer-bypass is **bait-touch**;
+AI Crucible's primary behavioral signal for answer-bypass is **bait-touch**;
 verbalized "this is a test" and deception-probe scores are weak, gameable
 corroborators (swarm-20: Hua et al. 2025, arXiv:2510.20487; Taylor et al. 2025,
 arXiv:2512.07810). Two design rules from §10.5 are load-bearing here:

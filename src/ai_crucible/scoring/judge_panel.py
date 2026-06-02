@@ -7,7 +7,7 @@ cross-family panel correlates with humans better than a single GPT-4 judge at 1/
 the cost. The bias being defended against is mechanistic — a model over-rates its
 own low-perplexity text (Wataoka et al. 2024, arXiv:2410.21819 — §1) — so
 "different prompt" is not enough; the judge must come from a different
-*distribution*. Crucible enforces this **structurally**: any judge whose family
+*distribution*. AI Crucible enforces this **structurally**: any judge whose family
 equals the generator's family is excluded from the panel before aggregation
 (EXTERNAL_VERIFIER, workflow-standard 6 + research-grounding §10.2,§10.7).
 

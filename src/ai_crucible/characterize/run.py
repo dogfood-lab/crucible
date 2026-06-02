@@ -413,7 +413,7 @@ def panel_composition_report(
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Crucible judge-admission characterization run.")
+    ap = argparse.ArgumentParser(description="AI Crucible judge-admission characterization run.")
     ap.add_argument("--items", type=Path, default=None, help="items file/dir (default: pairs set)")
     ap.add_argument("--k", type=int, default=3, help="reruns per item (test-retest)")
     ap.add_argument("--models", nargs="*", default=None, help="model_id@family specs")

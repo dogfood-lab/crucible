@@ -1,6 +1,6 @@
 """Instrument-quality scaffolding — the audit chain (research-grounding §9).
 
-Crucible is not just a game; it is a measurement instrument, and §9 specifies the
+AI Crucible is not just a game; it is a measurement instrument, and §9 specifies the
 end-to-end audit chain that makes its results trustworthy to a third party. This
 package is the Phase-1 *scaffolding* for that chain (§9.9): it doesn't run a
 single puzzle, it makes Phase-4's first diagnostic cycle **audit-ready by

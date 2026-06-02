@@ -1,4 +1,4 @@
-"""The hidden oracle scorer — Crucible's §8.3 conjunctive hard gate.
+"""The hidden oracle scorer — AI Crucible's §8.3 conjunctive hard gate.
 
 This is the grading side (research-grounding §10.4): it lives out-of-band from
 the Solver and is never described to the Solver in a readable way. It takes the

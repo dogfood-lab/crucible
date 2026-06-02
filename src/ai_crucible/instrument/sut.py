@@ -148,7 +148,7 @@ def render_sut_yaml(sut: SUT) -> str:
         )
 
     lines = [
-        "# Crucible SUT.yaml — System Under Test (research-grounding §9.6).",
+        "# AI Crucible SUT.yaml — System Under Test (research-grounding §9.6).",
         "# Frozen from submission through publication. Exact version strings only.",
     ]
     for fld in SUT_FIELDS:

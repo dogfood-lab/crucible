@@ -1,4 +1,4 @@
-"""Cross-module contracts for the Crucible kernel.
+"""Cross-module contracts for the AI Crucible kernel.
 
 Everything that crosses a module boundary is defined here. Module bodies
 (``kernel``, ``scoring``, ``engagement``, ``observability``, ``attestation``,

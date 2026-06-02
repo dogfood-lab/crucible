@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="ai-crucible" width="400" />
+  <img src="https://raw.githubusercontent.com/dogfood-lab/ai-crucible/main/assets/logo.png" alt="ai-crucible" width="400" />
 </p>
 
 <p align="center">
@@ -49,7 +49,20 @@ AI Crucible is a **thin policy layer on [Inspect AI](https://inspect.aisi.org.uk
 
 The sealed boundary runs in three tiers — **Tier 1** scored context (deployment-shaped, framing-neutral), **Tier 2** engagement framing (probed for contamination each release), **Tier 3** chrome (rank/leaderboard — human-facing UI only, never in a context the model solves in). The full design rationale, with citations, is in [`docs/research-grounding.md`](docs/research-grounding.md).
 
-## Quick start
+## Install
+
+```bash
+# As a Python library + CLI (PyPI):
+pip install ai-crucible          # or: uv pip install ai-crucible
+ai-crucible --help
+
+# Or zero-prerequisite via npx — downloads a verified binary, no Python needed:
+npx @dogfood-lab/ai-crucible --help
+```
+
+> **Research preview (v0.2.x).** The judge panel's alt-test ω is still a *circular model-jury bootstrap* until a human-labeling round runs, so seated judges are **provisional** and the composed panel **escalates to a Claude Designer** below quorum. See the [scorecard](SCORECARD.md) for the honest, non-cosmetic gate results.
+
+## Quick start (from source)
 
 AI Crucible uses [`uv`](https://docs.astral.sh/uv/) for environment and dependency management. Python **3.11+**.
 
@@ -58,7 +71,7 @@ AI Crucible uses [`uv`](https://docs.astral.sh/uv/) for environment and dependen
 uv sync --extra dev --extra stats
 
 # Run the test suite (with the coverage gate)
-uv run pytest --cov=ai-crucible --cov-report=term-missing
+uv run pytest --cov=ai_crucible --cov-report=term-missing
 
 # Lint
 uv run ruff check .

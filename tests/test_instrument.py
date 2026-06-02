@@ -103,7 +103,7 @@ def test_render_preregistration_is_deterministic_and_complete():
     md1 = render_preregistration(answers)
     md2 = render_preregistration(answers)
     assert md1 == md2  # PIN_PER_STEP: same answers -> same bytes
-    assert md1.startswith("# Crucible — Pre-registration")
+    assert md1.startswith("# AI Crucible — Pre-registration")
     # All nine questions render.
     for q in template["questions"]:
         assert f"Q{q['number']}." in md1

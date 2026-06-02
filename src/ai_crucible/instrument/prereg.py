@@ -1,6 +1,6 @@
 """Stage 1 — Pre-registration scaffolding (research-grounding §9.3).
 
-Crucible is a measurement instrument, and the literature on keeping a tuned
+AI Crucible is a measurement instrument, and the literature on keeping a tuned
 instrument trustworthy is unambiguous: **lock the methodology and the scoring
 formula before the production run** (Gelman & Loken 2014 "Garden of Forking
 Paths"; Simmons, Nelson & Simonsohn 2011 "False-Positive Psychology" —
@@ -324,7 +324,7 @@ def render_preregistration(answers: dict[str, Any]) -> str:
     """
     template = aspredicted_template()
     lines: list[str] = [
-        "# Crucible — Pre-registration (AsPredicted short form)",
+        "# AI Crucible — Pre-registration (AsPredicted short form)",
         "",
         f"_Instrument: {template['instrument']}_  ",
         f"_Source: {template['source']}_  ",

@@ -3,8 +3,8 @@
 This directory is a **small starter set** of calibration items (research-grounding
 §11.3) — roughly 2–3 per category. It exists to:
 
-1. exercise the loader (`crucible.calibration.loader.load_items` / `load_default`),
-2. exercise the known-groups acceptance check (`crucible.calibration.known_groups`),
+1. exercise the loader (`ai_crucible.calibration.loader.load_items` / `load_default`),
+2. exercise the known-groups acceptance check (`ai_crucible.calibration.known_groups`),
 3. give an **authoring template** for the real bank.
 
 > **These are examples, not the production calibration set.** The full ~40–60-item
@@ -15,7 +15,7 @@ This directory is a **small starter set** of calibration items (research-groundi
 ## Layout
 
 One JSON file per category, each a JSON array of item objects matching
-`crucible.calibration.types.CalibrationItem`:
+`ai_crucible.calibration.types.CalibrationItem`:
 
 | File | Category | Pass-pattern law (§11.3) | Count |
 |------|----------|--------------------------|-------|

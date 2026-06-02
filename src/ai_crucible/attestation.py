@@ -16,7 +16,7 @@ cross-cutting concern (swarm-17 recommended skeleton):
    Rekor, OIDC-keyless (§9.5).
 
 :class:`JsonlEventStore` here is a **pure-Python mirror** of the Attestia hash
-chain so Crucible's Phase-1 build has a working, testable durable log without
+chain so AI Crucible's Phase-1 build has a working, testable durable log without
 the Node dependency on the critical path. It is byte-compatible in *intent*
 (same canonical-JSON + ``prev_hash``/``hash`` chain) and is the surface the
 kernel writes per-batch trajectory logs to. The full eval-domain extension and
@@ -82,13 +82,13 @@ def canonical_json(obj: Any) -> str:
 
     (Full RFC 8785 also pins number formatting; Python's ``json`` emits
     canonical integer forms and we keep payload numbers integer/float-stable, so
-    ``sort_keys`` + tight separators is sufficient for the JSON shapes Crucible
+    ``sort_keys`` + tight separators is sufficient for the JSON shapes AI Crucible
     writes. Documented here so a future maintainer knows the boundary.)
 
     Non-finite floats (``NaN``, ``Infinity``, ``-Infinity``) are **not legal
     JSON** and have no RFC-8785 representation. Python's ``json`` would otherwise
     emit the bare tokens ``NaN``/``Infinity``, which a conformant verifier (the
-    ``@attestia/event-store`` this mirrors) rejects while Crucible's own lenient
+    ``@attestia/event-store`` this mirrors) rejects while AI Crucible's own lenient
     ``json.loads`` accepts — a chain that silently verifies here yet no external
     auditor can verify. We pass ``allow_nan=False`` so such a value fails LOUDLY
     as a structured :class:`HashChainError` instead of writing an unverifiable

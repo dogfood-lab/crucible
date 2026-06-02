@@ -1,4 +1,4 @@
-"""Tests for the Crucible scoring layer (stats / oracle / judge panel).
+"""Tests for the AI Crucible scoring layer (stats / oracle / judge panel).
 
 Covers the load-bearing behaviors the research grounding pins:
 

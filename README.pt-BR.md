@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.png" alt="ai-crucible" width="400" />
+  <img src="https://raw.githubusercontent.com/dogfood-lab/ai-crucible/main/assets/logo.png" alt="ai-crucible" width="400" />
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@ Uma sessão do Claude (**Designer**) cria desafios que visam lacunas de capacida
 
 ## O que o torna diferente
 
-- **Capacidade, não "trapaça".** O AI Crucible distingue *elegância* e *novidade* (recompensadas) de *desvio da resposta* (penalizado). O pensamento lateral é uma capacidade a ser medida, não um defeito a ser punido.
+- **Capacidade, não "trapaça".** O Crucible distingue *elegância* e *novidade* (recompensadas) de *desvio da resposta* (penalizado). O pensamento lateral é uma capacidade a ser medida, não um defeito a ser punido.
 - **O instrumento mede a si mesmo.** A formulação do prompt é um componente de medição de primeira classe — o kernel executa o mesmo desafio sob formulações `neutra` / `autorreferencial` / `social_standings` e relata seu próprio efeito do prompt como um diagnóstico.
 - **Uma fronteira de medição selada.** A motivação e a medição nunca compartilham uma janela de contexto; o oráculo oculto é avaliado fora da banda por uma família de modelos diferente, com o raciocínio do agente oculto. O modelo não pode manipular o que não consegue perceber.
 - **Confiabilidade por consistência.** `pass^k` (todas as *k* tentativas independentes têm sucesso), intervalos de Wilson e painéis de avaliação inter-familiares — criados para relatar distribuições, não estimativas pontuais.
@@ -29,11 +29,11 @@ Uma sessão do Claude (**Designer**) cria desafios que visam lacunas de capacida
 
 ## Modelo de ameaças (resumo)
 
-O principal adversário do AI Crucible é o **modelo em avaliação**, que pode tentar acessar a chave de resposta ou detectar e manipular a avaliação. Ele **acessa**: prompts/configuração do desafio, o próprio diretório de trabalho restrito do Solver e as chamadas da API do provedor do modelo que o operador configura. Ele **não** acessa: o oráculo/chave de resposta (avaliado fora da banda em um host separado que o Solver não pode acessar) ou elementos de motivação ("chrome" — classificação/posição — nunca injetados no contexto avaliado). **Permissões:** chaves do provedor do modelo por meio de variáveis de ambiente em tempo de execução; sem segredos embutidos, sem telemetria, sem chamadas externas próprias. Divulgação completa — incluindo onde uma fronteira é uma *defesa em profundidade* em vez de uma garantia absoluta — está em **[SECURITY.md](SECURITY.md)**.
+O principal adversário do Crucible é o **modelo em avaliação**, que pode tentar acessar a chave de resposta ou detectar e manipular a avaliação. Ele **acessa**: prompts/configuração do desafio, o próprio diretório de trabalho restrito do Solver e as chamadas da API do provedor do modelo que o operador configura. Ele **não** acessa: o oráculo/chave de resposta (avaliado fora da banda em um host separado que o Solver não pode acessar) ou elementos de motivação ("chrome" — classificação/posição — nunca injetados no contexto avaliado). **Permissões:** chaves do provedor do modelo por meio de variáveis de ambiente em tempo de execução; sem segredos embutidos, sem telemetria, sem chamadas externas próprias. Divulgação completa — incluindo onde uma fronteira é uma *defesa em profundidade* em vez de uma garantia absoluta — está em **[SECURITY.md](SECURITY.md)**.
 
 ## Arquitetura
 
-O AI Crucible é uma **camada de política fina sobre [Inspect AI](https://inspect.aisi.org.uk/)** (UK AISI), não um conjunto de ferramentas criado do zero. Um único objeto `AttemptState` é passado de Designer → Solver → (Critic) → Judge por meio de **um único ponto de estrangulamento `generate`**, para que cada chamada de modelo e ferramenta seja observável.
+O Crucible é uma **camada de política fina sobre [Inspect AI](https://inspect.aisi.org.uk/)** (UK AISI), não um conjunto de ferramentas criado do zero. Um único objeto `AttemptState` é passado de Designer → Solver → (Critic) → Judge por meio de **um único ponto de estrangulamento `generate`**, para que cada chamada de modelo e ferramenta seja observável.
 
 | Módulo | Responsabilidade |
 | ------ | -------------- |
@@ -49,16 +49,29 @@ O AI Crucible é uma **camada de política fina sobre [Inspect AI](https://inspe
 
 A fronteira selada é executada em três níveis — **Nível 1** contexto avaliado (moldado pela implantação, neutro em termos de formulação), **Nível 2** formulação de engajamento (verificado quanto à contaminação em cada lançamento), **Nível 3** elementos visuais (classificação/tabela de classificação — interface voltada para o usuário, nunca em um contexto no qual o modelo resolve). A justificativa completa do projeto, com citações, está em [`docs/research-grounding.md`](docs/research-grounding.md).
 
-## Início rápido
+## Instalar
 
-O AI Crucible usa [`uv`](https://docs.astral.sh/uv/) para gerenciamento de ambiente e dependências. Python **3.11+**.
+```bash
+# As a Python library + CLI (PyPI):
+pip install ai-crucible          # or: uv pip install ai-crucible
+ai-crucible --help
+
+# Or zero-prerequisite via npx — downloads a verified binary, no Python needed:
+npx @dogfood-lab/ai-crucible --help
+```
+
+> **Versão de teste para pesquisa (v0.2.x).** O teste alternativo ω do painel de avaliadores ainda é um *modelo circular de avaliação por jurados*, até que seja realizada uma rodada de avaliação humana. Assim, os avaliadores presentes são **provisórios** e o painel formado **passa a ser um Claude Designer** quando não atinge o quórum. Consulte a [tabela de resultados](SCORECARD.md) para obter os resultados honestos e objetivos.
+
+## Início rápido (a partir do código-fonte)
+
+O Crucible usa [`uv`](https://docs.astral.sh/uv/) para gerenciamento de ambiente e dependências. Python **3.11+**.
 
 ```bash
 # Create the venv and install the dev + stats extras
 uv sync --extra dev --extra stats
 
 # Run the test suite (with the coverage gate)
-uv run pytest --cov=ai-crucible --cov-report=term-missing
+uv run pytest --cov=ai_crucible --cov-report=term-missing
 
 # Lint
 uv run ruff check .
@@ -69,7 +82,7 @@ bash verify.sh
 
 ## Documentação
 
-- **[Handbook](https://dogfood-lab.github.io/ai-crucible/)** — guias, arquitetura e referência.
+- **[Handbook](https://dogfood-lab.github.io/crucible/)** — guias, arquitetura e referência.
 - [`docs/research-grounding.md`](docs/research-grounding.md) — justificativa do projeto, com citações.
 - [`docs/gameplan.md`](docs/gameplan.md) — roteiro e questões em aberto.
 - [`SECURITY.md`](SECURITY.md) — modelo de ameaças + divulgação honesta dos riscos residuais.

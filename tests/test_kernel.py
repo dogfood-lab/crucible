@@ -1,4 +1,4 @@
-"""End-to-end tests for the Crucible kernel (ai_crucible.kernel).
+"""End-to-end tests for the AI Crucible kernel (ai_crucible.kernel).
 
 The kernel is the Wave-2 integrator: it composes the Wave-1 leaf modules into
 :func:`run_attempt` and :func:`run_pass_hat_k`. These tests drive the *real*

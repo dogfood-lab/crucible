@@ -445,7 +445,7 @@ def test_append_rejects_non_finite_float_nan(tmp_path) -> None:
     serialize to RFC-8785-illegal ``NaN`` that a conformant verifier rejects.
 
     RFC 8785 / JSON proper has no ``NaN``/``Infinity`` literals; the Attestia
-    ``@attestia/event-store`` this mirrors would reject such a line. Crucible's
+    ``@attestia/event-store`` this mirrors would reject such a line. AI Crucible's
     lenient ``json.loads`` would *accept* it and ``verify_hash_chain`` would
     return True — a chain that no conformant auditor can verify. So we refuse to
     write the line at all (§9.5: the value is a real integrity proof).

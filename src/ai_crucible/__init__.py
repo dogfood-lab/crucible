@@ -1,4 +1,4 @@
-"""Crucible — a diagnostic adversarial game for frontier LLMs.
+"""AI Crucible — a diagnostic adversarial game for frontier LLMs.
 
 A policy-enforced kernel mediates a Designer -> Solver -> (Critic) -> Judge-panel
 cycle, scores against a hidden oracle, and curates a Lab/Arena/Regression catalog.

@@ -20,6 +20,16 @@ model and grading functions, so it runs offline.
 
 ## Install
 
+The published toolchain (once a release is cut):
+
+```bash
+pip install ai-crucible                # Python library + the ai-crucible CLI
+# ...or zero-prerequisite (downloads a verified binary, no Python needed):
+npx @dogfood-lab/ai-crucible --help
+```
+
+### From source (contributors)
+
 ```bash
 git clone https://github.com/dogfood-lab/ai-crucible.git
 cd ai-crucible

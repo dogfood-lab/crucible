@@ -1,4 +1,4 @@
-"""Crucible scoring layer — oracle gate, judge panel, small-N statistics.
+"""AI Crucible scoring layer — oracle gate, judge panel, small-N statistics.
 
 The scoring domain owns three concerns (research-grounding §10.6 "Scoring"):
 

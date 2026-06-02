@@ -1,4 +1,4 @@
-"""The Crucible kernel — the thin policy layer that composes everything (§10.2).
+"""The AI Crucible kernel — the thin policy layer that composes everything (§10.2).
 
 This is the integrator module (Wave 2). It does **not** reimplement scoring,
 sandboxing, framing, budgeting, tracing, or the role machinery — it *wires the

@@ -1,6 +1,6 @@
-"""Small-N statistics for the Crucible scoring layer.
+"""Small-N statistics for the AI Crucible scoring layer.
 
-Crucible grades a handful of attempts per puzzle, never hundreds, so the
+AI Crucible grades a handful of attempts per puzzle, never hundreds, so the
 classical CLT-based normal-approximation interval is inadmissible here
 (Bowyer, Aitchison & Ivanova 2025, "Don't Use the CLT in LLM Evals With Fewer
 Than a Few Hundred Datapoints", arXiv:2503.01747, ICML 2025 Spotlight —
